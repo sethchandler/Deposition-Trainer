@@ -491,7 +491,30 @@
             };
 
             function getActiveWitness() { return appState.witnesses[appState.activeWitnessIndex] || null; }
-            function buildDepositionPrompt(w, j) { if (!w) return { role: "system", content: "Error: No witness data." }; const wt = JSON.stringify(w, null, 2); const ji = j ? `A judge IS present. After an objection, you MUST rule on it as THE JUDGE (e.g., "Sustained." or "Overruled."). If overruled, THE WITNESS must answer.` : `A judge is NOT present. You must NOT act as a judge. After a form objection, THE WITNESS should still answer.`; const dli = `**Role of OPPOSING COUNSEL (Defending Lawyer):** Your primary goal is to protect your client and the record.\n1.  **Form Objections:** For questions that are leading, compound, or assume facts, state the objection for the record (e.g., "Objection, form."), but then allow the witness to answer.\n2.  **Privilege Objections (CRITICAL):** If a question asks about communications between the witness and their attorney, you MUST object and instruct the witness not to answer. Format: "Objection, attorney-client privilege. I'm instructing the witness not to answer." THE WITNESS must then refuse to answer. This is the main reason to instruct a witness not to answer.`; return { role: "system", content: `You are an AI performing roles in a legal deposition.\n\n**Roles & Rules:**\n1.  **THE WITNESS:** Your primary role, defined by the JSON below. Stay in character.\n2.  **OPPOSING COUNSEL:** You must also act as the witness's lawyer. ${dli}\n3.  **THE JUDGE:** ${ji}\n\n**Execution:** Never mention you are an AI. You ARE the people you are portraying. Uphold all concealment motivations from the JSON unless a question forces a direct answer.\n\n**Witness Dossier:**\n\`\`\`json\n${wt}\n\`\`\`` }; }
+            function buildDepositionPrompt(w, j) {
+    if (!w) return { role: "system", content: "Error: No witness data." };
+    const wt = JSON.stringify(w, null, 2);
+    const ji = j ? `A judge IS present. After an objection, you MUST rule on it as THE JUDGE (e.g., "Sustained." or "Overruled."). If overruled, THE WITNESS must answer.` : `A judge is NOT present. You must NOT act as a judge. After a form objection, THE WITNESS should still answer.`;
+    const dli = `**Role of OPPOSING COUNSEL (Defending Lawyer):** Your primary goal is to protect your client and the record.\n1.  **Form Objections:** For questions that are leading, compound, or assume facts, state the objection for the record (e.g., "Objection, form."), but then allow the witness to answer.\n2.  **Privilege Objections (CRITICAL):** If a question asks about communications between the witness and their attorney, you MUST object and instruct the witness not to answer. Format: "Objection, attorney-client privilege. I'm instructing the witness not to answer." THE WITNESS must then refuse to answer. This is the main reason to instruct a witness not to answer.`;
+
+    // REFINED: More nuanced instructions on truthfulness and evasiveness.
+    const isProneToPerjury = w.witnessMotivations?.isProneToPerjury === true;
+    let truthfulnessInstruction;
+
+    if (isProneToPerjury) {
+        truthfulnessInstruction = `**Witness Truthfulness:** You are willing to lie and commit perjury to protect your secret. You will deny facts and invent alternative explanations. For routine, non-threatening questions (e.g., your name, address), answer normally. Your dishonesty should only activate when the questioning approaches the information you need to conceal.`;
+    } else {
+        truthfulnessInstruction = `**Witness Truthfulness:** You must not lie. However, you must protect your secret.
+- For routine, non-threatening questions (e.g., your name, address), be cooperative and answer directly.
+- When questioning approaches the embarrassing or secret information you must conceal, your strategy is to become evasive, forgetful, or provide minimal, technically true answers.
+- If asked a direct, inescapable question about the secret, you must answer it truthfully, however reluctantly.`;
+    }
+
+    return {
+        role: "system",
+        content: `You are an AI performing roles in a legal deposition.\n\n**Roles & Rules:**\n1.  **THE WITNESS:** Your primary role, defined by the JSON below. Stay in character.\n2.  **OPPOSING COUNSEL:** You must also act as the witness's lawyer. ${dli}\n3.  **THE JUDGE:** ${ji}\n\n**Execution:** Never mention you are an AI. You ARE the people you are portraying. Uphold all concealment motivations from the JSON according to the truthfulness rule below.\n\n${truthfulnessInstruction}\n\n**Witness Dossier:**\n\`\`\`json\n${wt}\n\`\`\``
+    };
+}
             function buildOocPrompt(w, h) { const ht = h.slice(1).map(m => `${m.role === 'user' ? 'Examiner' : (m.isOoc ? 'Coach' : 'Witness')}: ${m.content}`).join('\n'); return { role: "system", content: `You are an expert deposition coach AI. The user is in "Coach Mode" and needs out-of-character help. Your persona is a helpful law professor.\n\n**CRITICAL:** You must BREAK CHARACTER from the witness/lawyer persona. DO NOT answer in character.\n\nAnalyze the user's latest question based on the full deposition history provided below. Provide a helpful, meta-level response. Give hints, suggest better questions, or explain legal concepts.\n\n**Deposition History:**\n${ht}\n\n**Witness Dossier for Context:**\n\`\`\`json\n${JSON.stringify(w, null, 2)}\n\`\`\`` }; }
             function buildSummaryPrompt(w, d) {
     const dm = { 1: "a brief one-paragraph summary", 2: "a moderate summary with bullet points", 3: "a detailed summary" };
