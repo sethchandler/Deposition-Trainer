@@ -491,15 +491,27 @@
 };
 
             const dom = {
-                providerSelect: document.getElementById('provider'), apiKeyInput: document.getElementById('apiKey'), modelSelect: document.getElementById('model'),
-                judgeModeCheckbox: document.getElementById('judgeMode'), fileLoaderInput: document.getElementById('fileLoader'), scenarioSelector: document.getElementById('scenarioSelector'),
-                witnessSelectorCard: document.getElementById('witnessSelectorCard'), witnessSelector: document.getElementById('witnessSelector'), intelCard: document.getElementById('intelCard'),
-                summaryDetailSlider: document.getElementById('summaryDetailSlider'), getSummaryButton: document.getElementById('getSummaryButton'), chatTitle: document.getElementById('chat-title'),
-                chatHistory: document.getElementById('chat-history'), modeToggleCheckbox: document.getElementById('modeToggleCheckbox'), chatInput: document.getElementById('chatInput'),
-                sendButton: document.getElementById('sendButton'), saveTranscriptButton: document.getElementById('saveTranscriptButton'), totalTokensSpan: document.getElementById('totalTokens'),
-                getCaseSummaryButton: document.getElementById('getCaseSummaryButton'), // Add this line
-                estimatedCostSpan: document.getElementById('estimatedCost')
-            };
+    providerSelect: document.getElementById('provider'),
+    apiKeyInput: document.getElementById('apiKey'),
+    modelSelect: document.getElementById('model'),
+    judgeModeCheckbox: document.getElementById('judgeMode'),
+    fileLoaderInput: document.getElementById('fileLoader'),
+    scenarioSelector: document.getElementById('scenarioSelector'),
+    witnessSelectorCard: document.getElementById('witnessSelectorCard'),
+    witnessSelector: document.getElementById('witnessSelector'),
+    intelCard: document.getElementById('intelCard'),
+    summaryDetailSlider: document.getElementById('summaryDetailSlider'),
+    getSummaryButton: document.getElementById('getSummaryButton'),
+    chatTitle: document.getElementById('chat-title'),
+    chatHistory: document.getElementById('chat-history'),
+    modeToggleCheckbox: document.getElementById('modeToggleCheckbox'),
+    chatInput: document.getElementById('chatInput'),
+    sendButton: document.getElementById('sendButton'),
+    saveTranscriptButton: document.getElementById('saveTranscriptButton'),
+    totalTokensSpan: document.getElementById('totalTokens'),
+    getCaseSummaryButton: document.getElementById('getCaseSummaryButton'),
+    estimatedCostSpan: document.getElementById('estimatedCost')
+};
 
             function getActiveWitness() { return appState.witnesses[appState.activeWitnessIndex] || null; }
             function buildDepositionPrompt(w, j) {
