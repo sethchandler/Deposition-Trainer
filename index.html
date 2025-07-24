@@ -567,8 +567,37 @@ ${wt}
 
             function updateCost(u) { const p = PROVIDERS[appState.providerId]; const m = p.models.find(mod => mod.name === appState.model); if (!m || !u) return; const iC = (u.inputTokens / 1000000) * m.pricing.inputPerMillionTokens; const oC = (u.outputTokens / 1000000) * m.pricing.outputPerMillionTokens; appState.totalTokens += (u.inputTokens + u.outputTokens); appState.totalCost += (iC + oC); renderCost(); }
             function handleSaveTranscript() { const w = getActiveWitness(); if (!w) return; const wn = w.name || w?.witnessBackground?.personalDetails?.fullName || 'Unnamed Witness'; const t = new Date().toISOString().slice(0, 10); let tc = `# Deposition Transcript\n\n- **Witness:** ${wn}\n- **Date:** ${t}\n- **LLM Provider:** ${PROVIDERS[appState.providerId].label}\n- **LLM Model:** ${appState.model}\n---\n\n`; appState.messages.slice(1).forEach(m => { let s = ""; if (m.role === 'user') s = "Examiner"; else if (m.isOoc) s = "Coach"; else s = "Witness"; tc += `**${s}:** ${m.content}\n\n`; }); const b = new Blob([tc], { type: 'text/markdown' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = `Deposition-of-${wn.replace(/\s+/g, '_')}-${t}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
-            async function handleSendMessage() { const q = dom.chatInput.value.trim(); if (!q || appState.isLoading) return; const um = { role: 'user', content: q, isOoc: appState.isOocMode }; let tp; if (appState.isOocMode) { tp = buildOocPrompt(getActiveWitness(), appState.messages); } else { tp = buildDepositionPrompt(getActiveWitness(), appState.isJudgePresent); } const am = [tp, ...appState.messages.slice(1), um]; appState.messages.push(um); appState.isLoading = true; renderChatMessages(); updateUI(); dom.chatInput.value = ''; dom.chatInput.style.height = 'auto'; try { if (!appState.apiKey) throw new Error("API Key is missing."); const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: am }); message.isOoc = appState.isOocMode; appState.messages.push(message); updateCost(usage); } catch (e) { console.error("API Error:", e); appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true }); } finally { appState.isLoading = false; renderChatMessages(); updateUI(); } }
-            async function handleGetSummary() { const w = getActiveWitness(); if (!w || appState.isLoading) return; const dl = dom.summaryDetailSlider.value; const sp = buildSummaryPrompt(w, dl); appState.isLoading = true; renderChatMessages(); updateUI(); try { if (!appState.apiKey) throw new Error("API Key is missing."); const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: [sp] }); message.isOoc = true; appState.messages.push(message); updateCost(usage); } catch (e) { console.error("API Error:", e); appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true }); } finally { appState.isLoading = false; renderChatMessages(); updateUI(); } }
+            async function handleSendMessage() { const q = dom.chatInput.value.trim(); if (!q || appState.isLoading) return; const um = { role: 'user', content: q, isOoc: appState.isOocMode }; let tp; if (appState.isOocMode) { tp = buildOocPrompt(getActiveWitness(), appState.messages); } else { tp = buildDepositionPrompt(getActiveWitness(), appState.isJudgePresent); } const am = [tp, ...appState.messages.slice(1), um]; appState.messages.push(um); appState.isLoading = true; renderChatMessages(); updateUI(); dom.chatInput.value = ''; dom.chatInput.style.height = 'auto'; try { if (!appState.apiKey) throw new Error("API Key is missing."); const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: am }); message.isOoc = appState.isOocMode; appState.messages.push(message); updateCost(usage); } catch (e) { console.error("API Error:", e); appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true }); } finally {
+    appState.isLoading = false;
+    renderChatMessages();
+    updateUI();
+    dom.chatInput.focus(); // Add this line
+}
+             async function handleGetSummary() {
+    const w = getActiveWitness();
+    if (!w || appState.isLoading) return;
+    const dl = dom.summaryDetailSlider.value;
+    const sp = buildSummaryPrompt(w, dl);
+    appState.isLoading = true;
+    renderChatMessages();
+    updateUI();
+    try {
+        if (!appState.apiKey) throw new Error("API Key is missing.");
+        const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: [sp] });
+        message.isOoc = true;
+        appState.messages.push(message);
+        updateCost(usage);
+    } catch (e) {
+        console.error("API Error:", e);
+        appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true });
+    } finally {
+        appState.isLoading = false;
+        renderChatMessages();
+        updateUI();
+        // This is the line to add here:
+        dom.chatInput.focus(); 
+    }
+}                                   
             async function handleGetCaseSummary() {
     const w = getActiveWitness();
     if (!w || appState.isLoading) return;
@@ -590,6 +619,7 @@ ${wt}
         appState.isLoading = false;
         renderChatMessages();
         updateUI();
+        dom.chatInput.focus(); // Add this line
     }
 }
             function loadWitnessData(data) { appState.caseData = data; if (Array.isArray(data.witnesses)) { appState.witnesses = data.witnesses; dom.witnessSelector.innerHTML = ''; appState.witnesses.forEach((w, i) => { const o = document.createElement('option'); o.value = i; o.textContent = w.name || w?.witnessBackground?.personalDetails?.fullName || `Witness ${i + 1}`; dom.witnessSelector.appendChild(o); }); dom.witnessSelectorCard.style.display = 'block'; } else { appState.witnesses = [data]; dom.witnessSelectorCard.style.display = 'none'; } appState.activeWitnessIndex = 0; resetChat(); }
