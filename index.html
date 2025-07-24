@@ -177,8 +177,8 @@
             #chat-window {
                 display: flex;
                 flex-direction: column;
-                height: 65vh; /* This sets the card's height to 75% of the screen height */
-                min-height: 360px; /* Ensures it's never too small */
+                height: 75vh; /* This sets the card's height to 75% of the screen height */
+                min-height: 400px; /* Ensures it's never too small */
             }
 
         
@@ -220,6 +220,55 @@
             color: #573a00;
             align-self: stretch;
             max-width: 100%;
+        }
+        
+        /* Markdown rendering styles */
+        .chat-message h1, .chat-message h2, .chat-message h3 {
+            margin: 16px 0 8px 0;
+            font-weight: 600;
+        }
+        .chat-message h1 { font-size: 1.4em; }
+        .chat-message h2 { font-size: 1.3em; }
+        .chat-message h3 { font-size: 1.2em; }
+        .chat-message ul, .chat-message ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .chat-message li {
+            margin: 4px 0;
+        }
+        .chat-message strong {
+            font-weight: 600;
+        }
+        .chat-message em {
+            font-style: italic;
+        }
+        .chat-message code {
+            background-color: rgba(0,0,0,0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+        .chat-message pre {
+            background-color: rgba(0,0,0,0.1);
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+        .chat-message pre code {
+            background: none;
+            padding: 0;
+        }
+        .chat-message p {
+            margin: 8px 0;
+        }
+        .chat-message p:first-child {
+            margin-top: 0;
+        }
+        .chat-message p:last-child {
+            margin-bottom: 0;
         }
         .typing-indicator {
             padding: 8px 12px;
@@ -566,6 +615,25 @@ document.addEventListener('DOMContentLoaded', () => {
         },
     };
 
+    // Simple markdown to HTML converter
+    // Markdown to HTML converter using marked.js
+function markdownToHtml(text) {
+    if (!text || typeof text !== 'string') return text;
+    
+    // Check if the text contains markdown-like patterns
+    const hasMarkdown = /^#{1,3}\s|^\*\s|^-\s|^\d+\.\s|\*\*.*?\*\*|\*.*?\*|`.*?`|```[\s\S]*?```/m.test(text);
+    if (!hasMarkdown) return text;
+    
+    try {
+        return marked.parse(text);
+    } catch (e) {
+        console.error('Markdown parsing error:', e);
+        return text; // fallback to plain text
+    }
+}
+    
+ 
+
     // Get DOM elements
     const dom = {
         providerSelect: document.getElementById('provider'),
@@ -745,7 +813,22 @@ ${wt}
             } else {
                 md.classList.add(m.role === 'user' ? 'user-message' : 'assistant-message');
             }
-            md.textContent = m.content;
+            
+            // Render markdown for assistant messages (especially summaries)
+            if (m.role === 'assistant' || m.isOoc) {
+                const htmlContent = markdownToHtml(m.content);
+                if (htmlContent !== m.content) {
+                    // Contains markdown, render as HTML
+                    md.innerHTML = htmlContent;
+                } else {
+                    // Plain text
+                    md.textContent = m.content;
+                }
+            } else {
+                // User messages stay as plain text
+                md.textContent = m.content;
+            }
+            
             wr.appendChild(md);
             dom.chatHistory.appendChild(wr);
         });
