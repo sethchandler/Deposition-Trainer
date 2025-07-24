@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Setup Guide for Legal Professionals</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #f39c12;
+        }
+        .info-box {
+            background-color: #e8f4fd;
+            border: 1px solid #b3d7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        .success-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        .step {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .requirements-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .requirements-table th, .requirements-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .requirements-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .download-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        .download-button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+        .video-embed {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .command-box {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .os-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .os-tab {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .os-tab.active {
+            background-color: white;
+            font-weight: bold;
+        }
+        .os-content {
+            display: none;
+        }
+        .os-content.active {
+            display: block;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .toc h3 {
+            margin-top: 0;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 8px 0;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔒 Ollama Setup Guide</h1>
+        <p>Complete Privacy Mode for Seth Chandler's Deposition Trainer</p>
+        <p><em>Keep your sensitive legal data on YOUR computer, never in the cloud</em></p>
+    </div>
+
+    <div class="toc">
+        <h3>📋 Table of Contents</h3>
+        <ul>
+            <li><a href="#what-is-ollama">What is Ollama?</a></li>
+            <li><a href="#why-local">Why Use Local AI?</a></li>
+            <li><a href="#requirements">System Requirements</a></li>
+            <li><a href="#installation">Installation Steps</a></li>
+            <li><a href="#models">Downloading Models</a></li>
+            <li><a href="#testing">Testing Your Setup</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+            <li><a href="#resources">Additional Resources</a></li>
+        </ul>
+    </div>
+
+    <section id="what-is-ollama">
+        <h2>🤖 What is Ollama?</h2>
+        <div class="info-box">
+            <strong>Ollama</strong> is a user-friendly application that lets you run powerful AI language models directly on your own computer, rather than sending your data to companies like OpenAI or Google.
+            
+            <p><strong>Key Points:</strong></p>
+            <ul>
+                <li><strong>Runs locally:</strong> The AI model runs entirely on YOUR computer, not on the internet</li>
+                <li><strong>No internet required:</strong> Once installed, it works completely offline</li>
+                <li><strong>Free to use:</strong> No monthly fees or pay-per-use charges</li>
+                <li><strong>Private:</strong> Your conversations never leave your machine</li>
+                <li><strong>No coding required:</strong> Simple commands to get started</li>
+            </ul>
+        </div>
+
+        <p><strong>Think of it like this:</strong> Instead of calling a lawyer in another city for advice (cloud AI), you're hiring a lawyer to work in your own office (local AI). Everything stays in-house.</p>
+    </section>
+
+    <section id="why-local">
+        <h2>🔐 Why Use Local AI for Legal Work?</h2>
+        <div class="success-box">
+            <h4>Privacy Benefits for Legal Professionals:</h4>
+            <ul>
+                <li>✅ <strong>Attorney-Client Privilege:</strong> Sensitive information never transmitted to third parties</li>
+                <li>✅ <strong>GDPR/Privacy Compliance:</strong> Data never leaves your jurisdiction</li>
+                <li>✅ <strong>No Data Retention:</strong> Cloud providers can't store or analyze your cases</li>
+                <li>✅ <strong>Offline Operation:</strong> Works without internet, perfect for secure environments</li>
+                <li>✅ <strong>No Usage Tracking:</strong> Nobody knows what cases you're working on</li>
+                <li>✅ <strong>Cost Control:</strong> No surprise bills for heavy usage</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="requirements">
+        <h2>💻 System Requirements</h2>
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong> Local AI requires a powerful computer. This is NOT suitable for basic laptops or older machines.
+        </div>
+
+        <table class="requirements-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Minimum</th>
+                    <th>Recommended</th>
+                    <th>Why It Matters</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>RAM (Memory)</strong></td>
+                    <td>16 GB</td>
+                    <td>32 GB+</td>
+                    <td>Models are loaded entirely into memory</td>
+                </tr>
+                <tr>
+                    <td><strong>Storage</strong></td>
+                    <td>50 GB free</td>
+                    <td>100 GB+</td>
+                    <td>Each model is 4-40 GB in size</td>
+                </tr>
+                <tr>
+                    <td><strong>Processor (CPU)</strong></td>
+                    <td>Recent Intel/AMD</td>
+                    <td>M1/M2 Mac or high-end Intel/AMD</td>
+                    <td>Faster processing = quicker responses</td>
+                </tr>
+                <tr>
+                    <td><strong>Graphics Card</strong></td>
+                    <td>Not required</td>
+                    <td>NVIDIA RTX 3070+ or M1/M2 Mac</td>
+                    <td>GPU acceleration makes responses 10x faster</td>
+                </tr>
+                <tr>
+                    <td><strong>Operating System</strong></td>
+                    <td>Windows 10+, macOS 11+, Linux</td>
+                    <td>Latest versions</td>
+                    <td>Newer OS = better performance</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <strong>💡 Performance Expectations:</strong>
+            <ul>
+                <li><strong>With GPU:</strong> Responses in 5-15 seconds</li>
+                <li><strong>CPU Only:</strong> Responses in 30-120 seconds</li>
+                <li><strong>Lower RAM:</strong> May crash or refuse to load models</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="installation">
+        <h2>🚀 Installation Steps</h2>
+        
+        <div class="os-tabs">
+            <div class="os-tab active" onclick="showOS('windows')">Windows</div>
+            <div class="os-tab" onclick="showOS('mac')">Mac</div>
+            <div class="os-tab" onclick="showOS('linux')">Linux</div>
+        </div>
+
+        <div id="windows" class="os-content active">
+            <div class="step">
+                <h3>Step 1: Download Ollama for Windows</h3>
+                <p>Go to the official Ollama website and download the Windows installer:</p>
+                <a href="https://ollama.com/download/windows" class="download-button" target="_blank">📥 Download Ollama for Windows</a>
+                <p><strong>File you'll get:</strong> <code>OllamaSetup.exe</code> (about 50MB)</p>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Run the Installer</h3>
+                <ol>
+                    <li>Double-click the <code>OllamaSetup.exe</code> file you downloaded</li>
+                    <li>Windows may show a security warning - click "More info" then "Run anyway"</li>
+                    <li>Follow the installation wizard (just click "Next" through the steps)</li>
+                    <li>The installer will place Ollama in your Start Menu and create desktop shortcuts</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Open Command Prompt (Required for Setup)</h3>
+                <p><strong>Don't worry - this is simpler than it sounds!</strong></p>
+                <ol>
+                    <li>Press the <strong>Windows key + R</strong> on your keyboard</li>
+                    <li>Type <code>cmd</code> and press Enter</li>
+                    <li>A black window will open - this is the "Command Prompt"</li>
+                    <li>You'll type commands here to download AI models</li>
+                </ol>
+                <div class="info-box">
+                    <strong>💡 What is Command Prompt?</strong> Think of it as a way to give direct instructions to your computer using text commands instead of clicking buttons.
+                </div>
+            </div>
+        </div>
+
+        <div id="mac" class="os-content">
+            <div class="step">
+                <h3>Step 1: Download Ollama for Mac</h3>
+                <p>Go to the official Ollama website and download the Mac installer:</p>
+                <a href="https://ollama.com/download/mac" class="download-button" target="_blank">📥 Download Ollama for Mac</a>
+                <p><strong>File you'll get:</strong> <code>Ollama-darwin.zip</code></p>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Install Ollama</h3>
+                <ol>
+                    <li>Double-click the downloaded <code>Ollama-darwin.zip</code> file to extract it</li>
+                    <li>Drag the <strong>Ollama</strong> app to your <strong>Applications</strong> folder</li>
+                    <li>Open the Applications folder and double-click <strong>Ollama</strong></li>
+                    <li>macOS may ask for permission - click "Open"</li>
+                    <li>Ollama will appear in your menu bar (top right of screen)</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Open Terminal (Required for Setup)</h3>
+                <p><strong>Don't worry - this is simpler than it sounds!</strong></p>
+                <ol>
+                    <li>Press <strong>Command + Space</strong> to open Spotlight search</li>
+                    <li>Type <code>terminal</code> and press Enter</li>
+                    <li>A window with a black background will open</li>
+                    <li>You'll type commands here to download AI models</li>
+                </ol>
+            </div>
+        </div>
+
+        <div id="linux" class="os-content">
+            <div class="step">
+                <h3>Step 1: Install Ollama on Linux</h3>
+                <p>Open your terminal and run this command:</p>
+                <div class="command-box">curl -fsSL https://ollama.com/install.sh | sh</div>
+                <p>This will automatically download and install Ollama on your system.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="models">
+        <h2>🧠 Downloading AI Models</h2>
+        <div class="info-box">
+            <strong>What are AI Models?</strong> Think of them as different "brains" with varying capabilities. Larger models are smarter but require more powerful computers.
+        </div>
+
+        <h3>Recommended Models for Legal Work</h3>
+        <table class="requirements-table">
+            <thead>
+                <tr>
+                    <th>Model Name</th>
+                    <th>Size</th>
+                    <th>RAM Needed</th>
+                    <th>Quality</th>
+                    <th>Best For</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background-color: #e8f5e8;">
+                    <td><strong>llama3.1:8b</strong> ⭐ <em>Recommended</em></td>
+                    <td>4.7 GB</td>
+                    <td>8-16 GB</td>
+                    <td>Very Good</td>
+                    <td>Most users - good balance of speed and quality</td>
+                </tr>
+                <tr>
+                    <td><strong>qwen2.5:7b</strong></td>
+                    <td>4.4 GB</td>
+                    <td>8-16 GB</td>
+                    <td>Good</td>
+                    <td>Excellent at following instructions precisely</td>
+                </tr>
+                <tr>
+                    <td><strong>mistral:7b</strong></td>
+                    <td>4.1 GB</td>
+                    <td>8-16 GB</td>
+                    <td>Good</td>
+                    <td>General purpose, reliable</td>
+                </tr>
+                <tr style="background-color: #fff3cd;">
+                    <td><strong>llama3.1:70b</strong> ⚡ <em>High-end</em></td>
+                    <td>40 GB</td>
+                    <td>64+ GB</td>
+                    <td>Excellent</td>
+                    <td>Near GPT-4 quality - requires powerful machine</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="step">
+            <h3>Download Your First Model</h3>
+            <p>In your Command Prompt (Windows) or Terminal (Mac/Linux), type one of these commands:</p>
+            
+            <h4>For Most Users (Recommended):</h4>
+            <div class="command-box">ollama pull llama3.1:8b</div>
+            
+            <h4>Alternative Options:</h4>
+            <div class="command-box">ollama pull qwen2.5:7b</div>
+            <div class="command-box">ollama pull mistral:7b</div>
+            
+            <div class="warning-box">
+                <strong>⚠️ This will take time!</strong> The download can take 30 minutes to 2 hours depending on your internet speed. The models are several gigabytes in size.
+            </div>
+            
+            <p><strong>What you'll see:</strong> Progress bars showing the download. Don't close the window until it says "success".</p>
+        </div>
+
+        <div class="step">
+            <h3>Test Your Model</h3>
+            <p>Once downloaded, test that it works by running:</p>
+            <div class="command-box">ollama run llama3.1:8b</div>
+            <p>You should see a chat interface where you can type questions. Try asking: "What is attorney-client privilege?"</p>
+            <p>Type <code>/bye</code> to exit the chat.</p>
+        </div>
+    </section>
+
+    <section id="testing">
+        <h2>🧪 Testing Your Setup</h2>
+        <div class="step">
+            <h3>Method 1: Test in Seth Chandler's Deposition Trainer</h3>
+            <ol>
+                <li>Go back to the Deposition Trainer</li>
+                <li>Select "Ollama (Local - Privacy Mode)" as your provider</li>
+                <li>Click the "Test Connection" button</li>
+                <li>You should see "✅ Connected (X models)"</li>
+                <li>Select a model from the dropdown</li>
+                <li>Load a scenario and try asking a question</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Method 2: Direct API Test</h3>
+            <p>Open your web browser and go to:</p>
+            <div class="command-box">http://localhost:11434</div>
+            <p>You should see: "Ollama is running"</p>
+        </div>
+
+        <div class="success-box">
+            <h4>🎉 Success! You should now have:</h4>
+            <ul>
+                <li>✅ Ollama installed and running</li>
+                <li>✅ At least one AI model downloaded</li>
+                <li>✅ Successful connection test</li>
+                <li>✅ Complete privacy for your legal work</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="troubleshooting">
+        <h2>🔧 Troubleshooting Common Issues</h2>
+
+        <div class="step">
+            <h3>Problem: "Cannot connect to Ollama"</h3>
+            <h4>Solutions:</h4>
+            <ul>
+                <li><strong>Make sure Ollama is running:</strong> Look for Ollama in your system tray (Windows) or menu bar (Mac)</li>
+                <li><strong>Restart Ollama:</strong> Close it completely and reopen</li>
+                <li><strong>Check the port:</strong> Make sure no other software is using port 11434</li>
+                <li><strong>Firewall:</strong> Your firewall might be blocking Ollama</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Problem: "Out of memory" or slow responses</h3>
+            <h4>Solutions:</h4>
+            <ul>
+                <li><strong>Close other programs:</strong> Free up RAM by closing browsers, applications</li>
+                <li><strong>Try a smaller model:</strong> Use mistral:7b instead of llama3.1:70b</li>
+                <li><strong>Check your RAM:</strong> You might need more memory for the model you're trying to use</li>
+                <li><strong>Restart your computer:</strong> Sometimes helps free up memory</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Problem: Model download fails</h3>
+            <h4>Solutions:</h4>
+            <ul>
+                <li><strong>Check internet connection:</strong> Downloads are large (several GB)</li>
+                <li><strong>Try again:</strong> Downloads can resume if interrupted</li>
+                <li><strong>Check disk space:</strong> Make sure you have enough free storage</li>
+                <li><strong>Antivirus:</strong> Some antivirus software blocks large downloads</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Problem: Can't find Command Prompt/Terminal</h3>
+            <h4>Windows:</h4>
+            <ul>
+                <li>Click Start button → type "cmd" → press Enter</li>
+                <li>Or: Windows key + R → type "cmd" → press Enter</li>
+            </ul>
+            <h4>Mac:</h4>
+            <ul>
+                <li>Command + Space → type "terminal" → press Enter</li>
+                <li>Or: Applications → Utilities → Terminal</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="resources">
+        <h2>📚 Additional Resources</h2>
+        
+        <h3>🎥 Helpful YouTube Videos</h3>
+        <div class="info-box">
+            <ul>
+                <li><a href="https://www.youtube.com/results?search_query=ollama+installation+tutorial" target="_blank">"Ollama Installation Tutorial" - Multiple step-by-step guides</a></li>
+                <li><a href="https://www.youtube.com/results?search_query=local+AI+setup+beginners" target="_blank">"Local AI Setup for Beginners" - General overview videos</a></li>
+                <li><a href="https://www.youtube.com/results?search_query=ollama+windows+setup" target="_blank">"Ollama Windows Setup" - Windows-specific tutorials</a></li>
+                <li><a href="https://www.youtube.com/results?search_query=ollama+mac+installation" target="_blank">"Ollama Mac Installation" - Mac-specific guides</a></li>
+            </ul>
+        </div>
+
+        <h3>🔗 Official Resources</h3>
+        <div class="info-box">
+            <ul>
+                <li><a href="https://ollama.com/" target="_blank">Ollama Official Website</a> - Latest downloads and documentation</li>
+                <li><a href="https://github.com/ollama/ollama" target="_blank">Ollama GitHub Repository</a> - Technical documentation and updates</li>
+                <li><a href="https://ollama.com/library" target="_blank">Ollama Model Library</a> - Browse all available AI models</li>
+                <li><a href="https://discord.gg/ollama" target="_blank">Ollama Discord Community</a> - Get help from other users</li>
+            </ul>
+        </div>
+
+        <h3>💬 Getting Help</h3>
+        <div class="info-box">
+            <p><strong>If you're still having trouble:</strong></p>
+            <ul>
+                <li>📧 <strong>Email:</strong> Consider contacting your IT support if available</li>
+                <li>💻 <strong>Local computer stores:</strong> Many can help with installation for a fee</li>
+                <li>👥 <strong>Tech-savvy colleagues:</strong> Someone in your firm may have experience</li>
+                <li>🎓 <strong>Community colleges:</strong> Often offer basic computer help</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Important Security Note:</strong> Only download Ollama from the official website (ollama.com). Never download from third-party sites, as they may contain malware.
+        </div>
+    </section>
+
+    <div class="success-box" style="text-align: center; margin-top: 40px;">
+        <h3>🎯 Ready to Go!</h3>
+        <p>Once you have Ollama running with a model downloaded, return to <strong>Seth Chandler's Deposition Trainer</strong> and select "Ollama (Local - Privacy Mode)" as your provider.</p>
+        <p><strong>Your sensitive legal data will never leave your computer!</strong></p>
+    </div>
+
+    <script>
+        function showOS(osName) {
+            // Hide all OS content
+            const contents = document.querySelectorAll('.os-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.os-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected OS content
+            document.getElementById(osName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
