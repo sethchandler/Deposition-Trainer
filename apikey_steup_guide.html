@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Keys Setup Guide for Legal Professionals</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #f39c12;
+        }
+        .danger-box {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #dc3545;
+        }
+        .info-box {
+            background-color: #e8f4fd;
+            border: 1px solid #b3d7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        .success-box {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        .step {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .cost-table th, .cost-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .cost-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .provider-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        .provider-button:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+        .provider-button.openai {
+            background-color: #10a37f;
+        }
+        .provider-button.openai:hover {
+            background-color: #0d8a6b;
+        }
+        .provider-button.google {
+            background-color: #4285f4;
+        }
+        .provider-button.google:hover {
+            background-color: #3367d6;
+        }
+        .key-display {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+            border: 2px dashed #4a5568;
+        }
+        .provider-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .provider-tab {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+            flex: 1;
+            text-align: center;
+        }
+        .provider-tab.active {
+            background-color: white;
+            font-weight: bold;
+        }
+        .provider-content {
+            display: none;
+        }
+        .provider-content.active {
+            display: block;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .toc h3 {
+            margin-top: 0;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 8px 0;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .comparison-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .screenshot-placeholder {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 15px 0;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔑 API Keys Setup Guide</h1>
+        <p>Get Access to OpenAI (ChatGPT) and Google Gemini</p>
+        <p><em>For Seth Chandler's Deposition Trainer</em></p>
+    </div>
+
+    <div class="toc">
+        <h3>📋 Table of Contents</h3>
+        <ul>
+            <li><a href="#what-are-apis">What Are API Keys?</a></li>
+            <li><a href="#costs-warning">Important Cost Information</a></li>
+            <li><a href="#comparison">OpenAI vs. Google Gemini</a></li>
+            <li><a href="#openai-setup">OpenAI (ChatGPT) API Setup</a></li>
+            <li><a href="#google-setup">Google Gemini API Setup</a></li>
+            <li><a href="#security">Keeping Your Keys Secure</a></li>
+            <li><a href="#billing-management">Managing Costs & Billing</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <section id="what-are-apis">
+        <h2>🤖 What Are API Keys?</h2>
+        <div class="info-box">
+            <p><strong>API Key = Your Personal Access Code</strong></p>
+            <p>Think of an API key like your credit card number - it's a unique code that identifies you and allows you to pay for AI services programmatically.</p>
+            
+            <p><strong>Key Differences from Regular Subscriptions:</strong></p>
+            <ul>
+                <li><strong>ChatGPT Plus subscription ($20/month):</strong> Unlimited use through ChatGPT website</li>
+                <li><strong>ChatGPT API access:</strong> Pay-per-use through applications like the Deposition Trainer</li>
+                <li><strong>Google Gemini:</strong> Only available through API (no consumer subscription)</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong> Having a ChatGPT Plus subscription does NOT give you API access. These are completely separate services with different billing.
+        </div>
+
+        <h3>Why You Need API Keys for the Deposition Trainer</h3>
+        <p>The Deposition Trainer is a specialized application that needs to communicate directly with AI services. Instead of you copy-pasting text back and forth, the API key allows the application to send your questions and receive responses automatically.</p>
+    </section>
+
+    <section id="costs-warning">
+        <h2>💰 Important Cost Information</h2>
+        <div class="danger-box">
+            <h4>🚨 READ THIS BEFORE PROCEEDING</h4>
+            <p><strong>API usage is NOT free and NOT unlimited.</strong> You pay for each request based on the length of text processed.</p>
+            
+            <ul>
+                <li><strong>Typical deposition session cost:</strong> $0.50 - $5.00</li>
+                <li><strong>Heavy daily usage:</strong> $10 - $50+ per day</li>
+                <li><strong>Billing:</strong> Charged to your credit card monthly</li>
+                <li><strong>No automatic limits:</strong> You can accidentally spend hundreds if not careful</li>
+            </ul>
+        </div>
+
+        <table class="cost-table">
+            <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Free Credits</th>
+                    <th>Typical Cost</th>
+                    <th>Most Expensive Model</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>OpenAI</strong></td>
+                    <td>$5 (first 3 months)</td>
+                    <td>$0.15 - $0.60 per 1M tokens</td>
+                    <td>GPT-4o: $5 - $15 per 1M tokens</td>
+                </tr>
+                <tr>
+                    <td><strong>Google Gemini</strong></td>
+                    <td>Free tier available</td>
+                    <td>$0.35 - $0.70 per 1M tokens</td>
+                    <td>Gemini Pro: $3.50 - $10.50 per 1M tokens</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <strong>💡 What's a "token"?</strong> Roughly 3-4 characters of text. A typical deposition question and response might use 1,000-5,000 tokens (costing $0.001 - $0.02).
+        </div>
+
+        <h3>Cost Control Recommendations</h3>
+        <ul>
+            <li>✅ <strong>Set spending limits</strong> in your account settings</li>
+            <li>✅ <strong>Start with cheaper models</strong> (GPT-4o-mini, Gemini Flash)</li>
+            <li>✅ <strong>Monitor usage</strong> in the Deposition Trainer's cost tracker</li>
+            <li>✅ <strong>Use local Ollama</strong> for truly sensitive cases (see separate guide)</li>
+        </ul>
+    </section>
+
+    <section id="comparison">
+        <h2>⚖️ OpenAI vs. Google Gemini Comparison</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>OpenAI (ChatGPT)</th>
+                    <th>Google Gemini</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Setup Difficulty</strong></td>
+                    <td>Easy</td>
+                    <td>Moderate (Google Cloud required)</td>
+                </tr>
+                <tr>
+                    <td><strong>Free Credits</strong></td>
+                    <td>$5 for 3 months</td>
+                    <td>Generous free tier</td>
+                </tr>
+                <tr>
+                    <td><strong>Legal Reasoning</strong></td>
+                    <td>Excellent</td>
+                    <td>Very Good</td>
+                </tr>
+                <tr>
+                    <td><strong>Cost (typical usage)</strong></td>
+                    <td>Medium</td>
+                    <td>Lower</td>
+                </tr>
+                <tr>
+                    <td><strong>Response Speed</strong></td>
+                    <td>Fast</td>
+                    <td>Very Fast</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Privacy</strong></td>
+                    <td>Not used for training</td>
+                    <td>Not used for training</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="success-box">
+            <strong>💡 Recommendation:</strong> Start with OpenAI if you want simplicity, or Google Gemini if you want lower costs and don't mind a more complex setup.
+        </div>
+    </section>
+
+    <div class="provider-tabs">
+        <div class="provider-tab active" onclick="showProvider('openai')">🤖 OpenAI Setup</div>
+        <div class="provider-tab" onclick="showProvider('google')">🔍 Google Gemini Setup</div>
+    </div>
+
+    <div id="openai" class="provider-content active">
+        <section id="openai-setup">
+            <h2>🤖 OpenAI (ChatGPT) API Setup</h2>
+
+            <div class="step">
+                <h3>Step 1: Create an OpenAI Account</h3>
+                <p>Go to the OpenAI platform website (this is different from the regular ChatGPT website):</p>
+                <a href="https://platform.openai.com" class="provider-button openai" target="_blank">🔗 Go to OpenAI Platform</a>
+                
+                <ol>
+                    <li>Click <strong>"Sign up"</strong> in the top right corner</li>
+                    <li>Enter your email address and create a password</li>
+                    <li>Verify your email address (check your inbox)</li>
+                    <li>You may need to verify your phone number for security</li>
+                </ol>
+
+                <div class="info-box">
+                    <strong>💡 Important:</strong> Use the same email you use for professional purposes. This will be linked to your billing.
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Add Billing Information</h3>
+                <div class="warning-box">
+                    <strong>⚠️ Required Step:</strong> You must add a credit card even to use free credits. No charges will occur until you exceed your free allowance.
+                </div>
+
+                <ol>
+                    <li>Once logged in, look for <strong>"Billing"</strong> in the left sidebar</li>
+                    <li>Click <strong>"Payment methods"</strong></li>
+                    <li>Click <strong>"Add payment method"</strong></li>
+                    <li>Enter your credit card information</li>
+                    <li>Set up usage limits (recommended: $50/month maximum)</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    You'll see a billing dashboard with options to add credit cards and set spending limits
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Create an API Key</h3>
+                <ol>
+                    <li>In the left sidebar, click <strong>"API keys"</strong></li>
+                    <li>Click <strong>"Create new secret key"</strong></li>
+                    <li>Give it a name like "Deposition Trainer" (for your reference)</li>
+                    <li>Click <strong>"Create secret key"</strong></li>
+                    <li><strong>IMMEDIATELY COPY THE KEY</strong> - you can't see it again!</li>
+                </ol>
+
+                <div class="key-display">
+                    sk-proj-aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890aBcDeFgHiJkLmNoPqRsTuVwXyZ
+                    <br><small>↑ Example API key (this one won't work - you need your own)</small>
+                </div>
+
+                <div class="danger-box">
+                    <strong>🚨 CRITICAL:</strong> Copy this key immediately and store it safely. OpenAI will never show it again. If you lose it, you'll have to create a new one.
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 4: Test Your Setup</h3>
+                <ol>
+                    <li>Go back to Seth Chandler's Deposition Trainer</li>
+                    <li>Select <strong>"OpenAI"</strong> as your provider</li>
+                    <li>Paste your API key in the <strong>"API Key"</strong> field</li>
+                    <li>Select a model (start with <strong>"gpt-4o-mini"</strong> - it's cheaper)</li>
+                    <li>Load a scenario and try asking a question</li>
+                </ol>
+
+                <div class="success-box">
+                    <strong>✅ Success!</strong> If you get a response, your OpenAI API is working correctly.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="google" class="provider-content">
+        <section id="google-setup">
+            <h2>🔍 Google Gemini API Setup</h2>
+
+            <div class="warning-box">
+                <strong>⚠️ More Complex Setup:</strong> Google's setup is more involved because it goes through Google Cloud Platform. Don't worry - we'll walk through each step.
+            </div>
+
+            <div class="step">
+                <h3>Step 1: Create a Google Account (if needed)</h3>
+                <p>You'll need a Google account. If you already have Gmail, you're set. If not:</p>
+                <a href="https://accounts.google.com/signup" class="provider-button google" target="_blank">🔗 Create Google Account</a>
+                
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Use a professional email address if possible, as this will be associated with billing.
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 2: Go to Google AI Studio</h3>
+                <p>Google AI Studio is the easiest way to get a Gemini API key:</p>
+                <a href="https://aistudio.google.com" class="provider-button google" target="_blank">🔗 Go to Google AI Studio</a>
+                
+                <ol>
+                    <li>Sign in with your Google account</li>
+                    <li>You may need to accept terms of service</li>
+                    <li>You might see a welcome screen - click through the setup</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Step 3: Create an API Key</h3>
+                <ol>
+                    <li>Look for <strong>"Get API key"</strong> button (usually prominent on the page)</li>
+                    <li>Click <strong>"Create API key"</strong></li>
+                    <li>You may need to create or select a Google Cloud project:
+                        <ul>
+                            <li>If prompted, click <strong>"Create new project"</strong></li>
+                            <li>Give it a name like "Deposition Trainer"</li>
+                            <li>Click <strong>"Create"</strong></li>
+                        </ul>
+                    </li>
+                    <li>Your API key will be generated and displayed</li>
+                    <li><strong>COPY THE KEY IMMEDIATELY</strong></li>
+                </ol>
+
+                <div class="key-display">
+                    AIzaSyDaGmWQW-_SxhVpGFGpC4Q5vIGvJx8w2mU
+                    <br><small>↑ Example API key (this one won't work - you need your own)</small>
+                </div>
+
+                <div class="screenshot-placeholder">
+                    You'll see the Google AI Studio interface with a prominent "Get API key" button
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>Step 4: Enable Billing (For Heavy Usage)</h3>
+                <div class="info-box">
+                    <strong>💡 Good News:</strong> Google Gemini has a generous free tier. You may not need to add billing immediately unless you plan heavy usage.
+                </div>
+
+                <p>If you exceed the free tier, you'll need to add billing:</p>
+                <ol>
+                    <li>Go to <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a></li>
+                    <li>Select your project (the one you created for the API key)</li>
+                    <li>In the left menu, go to <strong>"Billing"</strong></li>
+                    <li>Click <strong>"Link a billing account"</strong></li>
+                    <li>Add your credit card information</li>
+                    <li>Set up budget alerts (recommended: $25/month)</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h3>Step 5: Test Your Setup</h3>
+                <ol>
+                    <li>Go back to Seth Chandler's Deposition Trainer</li>
+                    <li>Select <strong>"Google Gemini"</strong> as your provider</li>
+                    <li>Paste your API key in the <strong>"API Key"</strong> field</li>
+                    <li>Select a model (start with <strong>"gemini-2.5-flash"</strong> - it's cheaper)</li>
+                    <li>Load a scenario and try asking a question</li>
+                </ol>
+
+                <div class="success-box">
+                    <strong>✅ Success!</strong> If you get a response, your Google Gemini API is working correctly.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section id="security">
+        <h2>🔒 Keeping Your API Keys Secure</h2>
+        <div class="danger-box">
+            <h4>🚨 CRITICAL SECURITY INFORMATION</h4>
+            <p>Your API keys are like credit card numbers. Anyone with access can make charges to your account.</p>
+        </div>
+
+        <h3>✅ DO:</h3>
+        <ul>
+            <li><strong>Store keys in a password manager</strong> (1Password, LastPass, etc.)</li>
+            <li><strong>Only paste keys into trusted applications</strong> like the Deposition Trainer</li>
+            <li><strong>Use different keys for different purposes</strong> (you can create multiple)</li>
+            <li><strong>Regularly check your billing dashboard</strong> for unexpected charges</li>
+            <li><strong>Delete keys you're no longer using</strong></li>
+        </ul>
+
+        <h3>❌ NEVER:</h3>
+        <ul>
+            <li><strong>Share keys in emails or text messages</strong></li>
+            <li><strong>Post keys in online forums or chat rooms</strong></li>
+            <li><strong>Save keys in unsecured documents</strong></li>
+            <li><strong>Give keys to untrusted applications</strong></li>
+            <li><strong>Use the same key for multiple unrelated projects</strong></li>
+        </ul>
+
+        <div class="info-box">
+            <strong>💡 If you suspect a key is compromised:</strong> Immediately delete it from your provider's dashboard and create a new one.
+        </div>
+    </section>
+
+    <section id="billing-management">
+        <h2>💳 Managing Costs & Billing</h2>
+
+        <div class="step">
+            <h3>Setting Spending Limits</h3>
+            <h4>OpenAI:</h4>
+            <ol>
+                <li>Go to <strong>Billing → Usage limits</strong></li>
+                <li>Set a monthly budget (e.g., $50)</li>
+                <li>Set up email alerts at 75% and 90% of your limit</li>
+            </ol>
+
+            <h4>Google Cloud:</h4>
+            <ol>
+                <li>Go to <strong>Billing → Budgets & alerts</strong></li>
+                <li>Create a new budget for your project</li>
+                <li>Set alert thresholds (50%, 90%, 100%)</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Monitoring Usage</h3>
+            <ul>
+                <li><strong>Daily:</strong> Check the cost tracker in the Deposition Trainer</li>
+                <li><strong>Weekly:</strong> Review your provider's usage dashboard</li>
+                <li><strong>Monthly:</strong> Review your credit card statement</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>⚠️ Watch for:</strong> Sudden spikes in usage that might indicate a problem or compromised key.
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Cost-Saving Tips</h3>
+            <ul>
+                <li>🔹 <strong>Start with cheaper models:</strong> GPT-4o-mini, Gemini Flash</li>
+                <li>🔹 <strong>Keep conversations focused:</strong> Longer chats cost more</li>
+                <li>🔹 <strong>Use Ollama for sensitive cases:</strong> Completely free after setup</li>
+                <li>🔹 <strong>Batch similar questions:</strong> Instead of multiple short conversations</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="troubleshooting">
+        <h2>🔧 Troubleshooting Common Issues</h2>
+
+        <div class="step">
+            <h3>Problem: "Invalid API Key" Error</h3>
+            <h4>Solutions:</h4>
+            <ul>
+                <li><strong>Check for typos:</strong> API keys are long and easy to mistype</li>
+                <li><strong>Verify the key isn't expired:</strong> Check your provider's dashboard</li>
+                <li><strong>Make sure you copied the entire key:</strong> They're usually 50+ characters</li>
+                <li><strong>Create a new key:</strong> Delete the old one and make a fresh one</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Problem: "Quota Exceeded" or "Billing Error"</h3>
+            <h4>Solutions:</h4>
+            <ul>
+                <li><strong>Check your billing:</strong> You may have hit your spending limit</li>
+                <li><strong>Add more credit:</strong> In your provider's billing section</li>
+                <li><strong>Verify payment method:</strong> Credit card may have expired</li>
+                <li><strong>Wait if using free tier:</strong> Quotas reset monthly</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Problem: "Model Not Available" Error</h3>
+            <h4>Solutions:</h4>
+            <ul>
+                <li><strong>Try a different model:</strong> Some models require higher access levels</li>
+                <li><strong>Check your account status:</strong> New accounts may have restrictions</li>
+                <li><strong>Wait and retry:</strong> Services occasionally have temporary outages</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Problem: Slow Responses</h3>
+            <h4>Possible causes:</h4>
+            <ul>
+                <li><strong>High demand:</strong> Services can be slower during peak hours</li>
+                <li><strong>Large requests:</strong> Very long prompts take more time to process</li>
+                <li><strong>Internet connection:</strong> Check your network speed</li>
+                <li><strong>Try a different model:</strong> Some are optimized for speed</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Getting Help</h3>
+            <div class="info-box">
+                <p><strong>If you're still having trouble:</strong></p>
+                <ul>
+                    <li>📚 <strong>OpenAI Help:</strong> <a href="https://help.openai.com" target="_blank">help.openai.com</a></li>
+                    <li>📚 <strong>Google Cloud Support:</strong> <a href="https://cloud.google.com/support" target="_blank">cloud.google.com/support</a></li>
+                    <li>💬 <strong>Community Forums:</strong> Reddit r/OpenAI, r/GoogleCloud</li>
+                    <li>📧 <strong>Contact your IT department</strong> if you work at a larger firm</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <div class="success-box" style="text-align: center; margin-top: 40px;">
+        <h3>🎯 You're All Set!</h3>
+        <p>Once you have your API key, return to <strong>Seth Chandler's Deposition Trainer</strong>, select your provider, paste your key, and start practicing depositions with AI assistance.</p>
+        <p><strong>Remember to monitor your usage and costs!</strong></p>
+    </div>
+
+    <script>
+        function showProvider(provider) {
+            // Hide all provider content
+            const contents = document.querySelectorAll('.provider-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.provider-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected provider content
+            document.getElementById(provider).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
