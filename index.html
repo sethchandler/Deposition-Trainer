@@ -337,18 +337,22 @@
             </div>
         </div>
         
-        <div class="card" id="intelCard" style="display: none;">
-            <h2 class="card-title">4. Pre-Deposition Intel</h2>
-            <div class="form-group">
-                <label for="summaryDetailSlider">Summary Detail Level</label>
-                <div class="slider-container">
-                    <span>Minimal</span>
-                    <input type="range" min="1" max="3" value="2" class="summary-slider" id="summaryDetailSlider">
-                    <span>Maximal</span>
-                </div>
-            </div>
-            <button id="getSummaryButton" class="button">Get Witness Summary</button>
+       <div class="card" id="intelCard" style="display: none;">
+    <h2 class="card-title">4. Pre-Deposition Intel</h2>
+    <div class="form-group">
+        <label for="summaryDetailSlider">Summary Detail Level</label>
+        <div class="slider-container">
+            <span>Minimal</span>
+            <input type="range" min="1" max="3" value="2" class="summary-slider" id="summaryDetailSlider">
+            <span>Maximal</span>
         </div>
+    </div>
+    <!-- NEW: Button container for better layout -->
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="getSummaryButton" class="button" style="flex: 1;">Get Witness Summary</button>
+        <button id="getCaseSummaryButton" class="button" style="flex: 1;">Get Case Summary</button>
+    </div>
+</div>
 
         <div class="card" id="costTrackerCard">
             <h2 class="card-title" style="margin-bottom: 10px;">Session Usage & Cost Estimate</h2>
@@ -528,6 +532,28 @@
     return {
         role: "user", // <-- This is the only line that has changed
         content: `You are a legal assistant providing a pre-deposition briefing. Based ONLY on the following pre-vetted information, provide ${di}. Do not infer or add any information not present below. Do not provide analysis or advice.\n\n**Vetted Witness Information:**\n\`\`\`json\n${JSON.stringify(pi, null, 2)}\n\`\`\``
+    };
+}
+            function buildCaseSummaryPrompt(w, d) {
+    const dm = { 1: "a brief one-paragraph summary", 2: "a moderate summary with bullet points", 3: "a detailed, multi-paragraph summary" };
+    const di = dm[d];
+    const wt = JSON.stringify(w, null, 2);
+
+    return {
+        role: "user",
+        content: `You are a senior legal analyst. Your task is to provide a plausible case summary based on the provided witness dossier. The dossier contains information about ONE witness in a larger, unstated legal case.
+
+Your analysis must:
+1.  **Infer the Legal Context:** Based on the witness's role, statements, and secrets, determine the most likely type of legal case this deposition is for (e.g., "age discrimination lawsuit," "personal injury claim," "homicide prosecution," "civil suit for battery").
+2.  **Synthesize a Narrative:** Create a brief narrative for the case. Who is likely suing whom (or who is prosecuting whom)? What is the central legal issue at stake?
+3.  **Use Only Provided Facts:** Base your summary ONLY on the information in the dossier. Do not invent details unrelated to the witness's testimony (e.g., do not invent new characters or events not hinted at in the dossier).
+4.  **Acknowledge Inference:** Frame your response as a plausible inference, not as established fact. For example, start with "This deposition appears to be part of..." or "The likely legal context for this witness is..."
+5.  **Adhere to Detail Level:** Provide ${di}.
+
+**Witness Dossier for Analysis:**
+\`\`\`json
+${wt}
+\`\`\``
     };
 }
 
