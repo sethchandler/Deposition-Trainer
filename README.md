@@ -18,6 +18,7 @@ This application is a simulation for educational and entertainment purposes only
 ## Features
 
 * **Multiple AI Providers**: Choose between leading models from OpenAI (GPT-4o, GPT-4o-mini) and Google (Gemini 2.5 Pro, Gemini 2.5 Flash).
+* **Local AI via Ollama**: For maximum privacy, you can run the trainer locally using your own model (requires some technical know-how)
 * **Pre-Built Scenarios**: Jump right in with detailed, ready-to-play scenarios involving complex witnesses.
 * **Upload Your Own Cases**: Create and upload your own witness profiles as `.json` files for customized practice.
 * **Interactive Coach Mode**: Stuck on a line of questioning? Toggle to "Coach Mode" to get out-of-character hints, strategic advice, and analysis of the witness's potential weaknesses.
@@ -30,7 +31,7 @@ This application is a simulation for educational and entertainment purposes only
 1.  **Select a Provider**: Choose either OpenAI or Google Gemini from the first dropdown menu.
 2.  **Enter Your API Key**: Paste your personal API key into the "API Key" field. (See below for how to get one).
 3.  **Choose a Scenario**: Select one of the pre-built scenarios or upload your own `.json` case file. (See instructions below)
-4.  **Get Intel (Optional)**: Click "Get Witness Summary" to receive a pre-deposition briefing on the witness.
+4.  **Get Intel (Optional)**: Click "Get Witness Summary" to receive a pre-deposition briefing on the witness. Or Click "Get Case Summary" to get a briefing on the case.
 5.  **Begin Deposition**: Start asking questions in the chat box.
 6.  **Switch to Coach**: If you need a hint, toggle from "Witness" to "Coach" before sending your message to get meta-level advice.
 
@@ -44,7 +45,7 @@ This tool is "client-side," meaning it runs entirely on your computer. When you 
 
 ### How to Get an API Key
 
-You will need to create an account with the provider and add a payment method (like a credit card). Most providers offer a small amount of free credits to new users, but sustained use will incur charges.
+You will need to create an account with the provider and add a payment method (like a credit card). Most providers offer a small amount of free credits to new users, but sustained use will incur charges. There are detailed instructions on how to get an API key here: https://github.com/sethchandler/Deposition-Trainer/apikey_steup_guide.html
 
 * **For OpenAI (GPT models):**
     1.  Go to the [OpenAI API Keys](https://platform.openai.com/api-keys) page.
@@ -237,6 +238,4 @@ Here is my case information: [INSERT YOUR INFORMATION HERE]"
 Remember: These JSON files are tools to help you think through your case systematically. They don't replace actual witness interviews, but they help you prepare better questions and anticipate problems."
 ---
 
-## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
