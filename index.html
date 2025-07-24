@@ -82,12 +82,76 @@
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
         .checkbox-group label {
             margin-bottom: 0;
             font-weight: normal;
         }
+        
+        /* Custom Checkbox Styling */
+        .custom-checkbox {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .custom-checkbox input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .custom-checkbox .checkmark {
+            position: relative;
+            height: 22px;
+            width: 22px;
+            background-color: var(--input-background);
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .custom-checkbox:hover .checkmark {
+            border-color: var(--button-background);
+            background-color: #f8f9fa;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: var(--button-background);
+            border-color: var(--button-background);
+        }
+        
+        .custom-checkbox .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        .custom-checkbox label {
+            font-size: 16px;
+            color: var(--text-color);
+            cursor: pointer;
+            line-height: 1.4;
+        }
+        
         .button {
             padding: 10px;
             border: none;
@@ -113,8 +177,8 @@
             #chat-window {
                 display: flex;
                 flex-direction: column;
-                height: 75vh; /* This sets the card's height to 75% of the screen height */
-                min-height: 400px; /* Ensures it's never too small */
+                height: 65vh; /* This sets the card's height to 75% of the screen height */
+                min-height: 360px; /* Ensures it's never too small */
             }
 
         
@@ -306,9 +370,12 @@
                 <label for="model">Model</label>
                 <select id="model"></select>
             </div>
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="judgeMode">
-                <label for="judgeMode">A Judge is present to rule on objections.</label>
+            <div class="form-group">
+                <div class="custom-checkbox">
+                    <input type="checkbox" id="judgeMode">
+                    <span class="checkmark"></span>
+                    <label for="judgeMode">A Judge is present to rule on objections.</label>
+                </div>
             </div>
         </div>
 
@@ -382,8 +449,11 @@
             </div>
         </div>
     </div>
- <script>
-  document.addEventListener('DOMContentLoaded', () => {
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Starting initialization');
+    
     // Obfuscated scenarios to prevent users from easily reading the secrets in the source code.
     const PRE_BUILT_SCENARIOS = [
         // Homicide Case: The Eyewitness with a Secret (John Sterling)
@@ -395,7 +465,18 @@
     ];
 
     let appState = {
-        providerId: 'openai', apiKey: '', model: '', isJudgePresent: false, isOocMode: false, caseData: null, witnesses: [], activeWitnessIndex: 0, messages: [], isLoading: false, totalTokens: 0, totalCost: 0.0
+        providerId: 'openai', 
+        apiKey: '', 
+        model: '', 
+        isJudgePresent: false, 
+        isOocMode: false, 
+        caseData: null, 
+        witnesses: [], 
+        activeWitnessIndex: 0, 
+        messages: [], 
+        isLoading: false, 
+        totalTokens: 0, 
+        totalCost: 0.0
     };
 
     const PROVIDERS = {
@@ -485,6 +566,7 @@
         },
     };
 
+    // Get DOM elements
     const dom = {
         providerSelect: document.getElementById('provider'),
         apiKeyInput: document.getElementById('apiKey'),
@@ -508,7 +590,13 @@
         estimatedCostSpan: document.getElementById('estimatedCost')
     };
 
-    function getActiveWitness() { return appState.witnesses[appState.activeWitnessIndex] || null; }
+    // Verify DOM elements exist
+    console.log('DOM elements found:', Object.keys(dom).filter(key => dom[key] !== null));
+    console.log('Missing DOM elements:', Object.keys(dom).filter(key => dom[key] === null));
+
+    function getActiveWitness() { 
+        return appState.witnesses[appState.activeWitnessIndex] || null; 
+    }
     
     function buildDepositionPrompt(w, j) {
         if (!w) return { role: "system", content: "Error: No witness data." };
@@ -546,9 +634,20 @@
     function buildSummaryPrompt(w, d) {
         const dm = { 1: "a brief one-paragraph summary", 2: "a moderate summary with bullet points", 3: "a detailed summary" };
         const di = dm[d];
-        const pi = { "Witness Name": w?.name || w?.witnessBackground?.personalDetails?.fullName, "Basic Details": { Age: w?.witnessBackground?.personalDetails?.age, Occupation: w?.witnessBackground?.personalDetails?.occupation, Residence: w?.witnessBackground?.personalDetails?.residence, }, "Professional Reputation": w?.witnessBackground?.professionalLife?.reputation, "Official Statement Summary": w?.fullWitnessInformation?.officialStatementSummary };
+        const pi = { 
+            "Witness Name": w?.name || w?.witnessBackground?.personalDetails?.fullName, 
+            "Basic Details": { 
+                Age: w?.witnessBackground?.personalDetails?.age, 
+                Occupation: w?.witnessBackground?.personalDetails?.occupation, 
+                Residence: w?.witnessBackground?.personalDetails?.residence 
+            }, 
+            "Professional Reputation": w?.witnessBackground?.professionalLife?.reputation, 
+            "Official Statement Summary": w?.fullWitnessInformation?.officialStatementSummary 
+        };
         Object.keys(pi).forEach(k => (pi[k] === undefined || pi[k] === null) && delete pi[k]);
-        if (pi["Basic Details"]) { Object.keys(pi["Basic Details"]).forEach(k => (pi["Basic Details"][k] === undefined || pi["Basic Details"][k] === null) && delete pi["Basic Details"][k]); }
+        if (pi["Basic Details"]) { 
+            Object.keys(pi["Basic Details"]).forEach(k => (pi["Basic Details"][k] === undefined || pi["Basic Details"][k] === null) && delete pi["Basic Details"][k]); 
+        }
         return {
             role: "user",
             content: `You are a legal assistant providing a pre-deposition briefing. Based ONLY on the following pre-vetted information, provide ${di}. Do not infer or add any information not present below. Do not provide analysis or advice.\n\n**Vetted Witness Information:**\n\`\`\`json\n${JSON.stringify(pi, null, 2)}\n\`\`\``
@@ -588,27 +687,53 @@ ${wt}
         };
     }
 
-    function renderProviderOptions() { dom.providerSelect.innerHTML = ''; for (const [id, p] of Object.entries(PROVIDERS)) { const o = document.createElement('option'); o.value = id; o.textContent = p.label; dom.providerSelect.appendChild(o); } }
+    function renderProviderOptions() { 
+        console.log('Rendering provider options...');
+        if (!dom.providerSelect) {
+            console.error('Provider select element not found!');
+            return;
+        }
+        
+        dom.providerSelect.innerHTML = ''; 
+        for (const [id, p] of Object.entries(PROVIDERS)) { 
+            const o = document.createElement('option'); 
+            o.value = id; 
+            o.textContent = p.label; 
+            dom.providerSelect.appendChild(o); 
+            console.log(`Added provider option: ${p.label}`);
+        } 
+        console.log('Provider options rendered successfully');
+    }
     
     function renderModelOptions() {
+        console.log('Rendering model options for provider:', appState.providerId);
         const p = PROVIDERS[appState.providerId];
         if (!p) {
             console.error("Selected provider not found:", appState.providerId);
             dom.modelSelect.innerHTML = '';
             return;
         }
+        if (!dom.modelSelect) {
+            console.error('Model select element not found!');
+            return;
+        }
+        
         dom.modelSelect.innerHTML = '';
         p.models.forEach(m => {
             const o = document.createElement('option');
             o.value = m.name;
             o.textContent = m.name;
             dom.modelSelect.appendChild(o);
+            console.log(`Added model option: ${m.name}`);
         });
         appState.model = p.defaultModel;
         dom.modelSelect.value = p.defaultModel;
+        console.log('Model options rendered successfully');
     }
 
     function renderChatMessages() {
+        if (!dom.chatHistory) return;
+        
         dom.chatHistory.innerHTML = '';
         appState.messages.slice(1).forEach(m => {
             const wr = document.createElement('div');
@@ -634,26 +759,30 @@ ${wt}
     }
 
     function renderCost() {
-        dom.totalTokensSpan.textContent = appState.totalTokens.toLocaleString();
-        dom.estimatedCostSpan.textContent = `$${appState.totalCost.toFixed(6)}`;
+        if (dom.totalTokensSpan) dom.totalTokensSpan.textContent = appState.totalTokens.toLocaleString();
+        if (dom.estimatedCostSpan) dom.estimatedCostSpan.textContent = `$${appState.totalCost.toFixed(6)}`;
     }
 
     function updateUI() {
         const w = getActiveWitness();
         const i = w !== null;
         const h = appState.messages.length > 1;
-        dom.intelCard.style.display = i ? 'block' : 'none';
-        dom.chatInput.disabled = !i || appState.isLoading;
-        dom.sendButton.disabled = !i || appState.isLoading;
-        dom.modeToggleCheckbox.disabled = !i || appState.isLoading;
-        dom.saveTranscriptButton.disabled = !i || appState.isLoading || !h;
-        dom.getSummaryButton.disabled = !i || appState.isLoading;
-        dom.getCaseSummaryButton.disabled = !i || appState.isLoading;
-        dom.chatInput.placeholder = appState.isOocMode ? "Ask for a hint or feedback..." : (i ? "Type your question..." : "Choose or upload a scenario to begin...");
-        if (w) {
+        
+        if (dom.intelCard) dom.intelCard.style.display = i ? 'block' : 'none';
+        if (dom.chatInput) {
+            dom.chatInput.disabled = !i || appState.isLoading;
+            dom.chatInput.placeholder = appState.isOocMode ? "Ask for a hint or feedback..." : (i ? "Type your question..." : "Choose or upload a scenario to begin...");
+        }
+        if (dom.sendButton) dom.sendButton.disabled = !i || appState.isLoading;
+        if (dom.modeToggleCheckbox) dom.modeToggleCheckbox.disabled = !i || appState.isLoading;
+        if (dom.saveTranscriptButton) dom.saveTranscriptButton.disabled = !i || appState.isLoading || !h;
+        if (dom.getSummaryButton) dom.getSummaryButton.disabled = !i || appState.isLoading;
+        if (dom.getCaseSummaryButton) dom.getCaseSummaryButton.disabled = !i || appState.isLoading;
+        
+        if (w && dom.chatTitle) {
             const wn = w.name || w?.witnessBackground?.personalDetails?.fullName || 'Unnamed Witness';
             dom.chatTitle.textContent = `Deposition of: ${wn}`;
-        } else {
+        } else if (dom.chatTitle) {
             dom.chatTitle.textContent = 'Deposition';
         }
     }
@@ -734,7 +863,7 @@ ${wt}
             appState.isLoading = false;
             renderChatMessages();
             updateUI();
-            dom.chatInput.focus();
+            if (dom.chatInput) dom.chatInput.focus();
         }
     }
 
@@ -759,7 +888,7 @@ ${wt}
             appState.isLoading = false;
             renderChatMessages();
             updateUI();
-            dom.chatInput.focus();
+            if (dom.chatInput) dom.chatInput.focus();
         }
     }
 
@@ -784,7 +913,7 @@ ${wt}
             appState.isLoading = false;
             renderChatMessages();
             updateUI();
-            dom.chatInput.focus();
+            if (dom.chatInput) dom.chatInput.focus();
         }
     }
 
@@ -792,70 +921,92 @@ ${wt}
         appState.caseData = data;
         if (Array.isArray(data.witnesses)) {
             appState.witnesses = data.witnesses;
-            dom.witnessSelector.innerHTML = '';
-            appState.witnesses.forEach((w, i) => {
-                const o = document.createElement('option');
-                o.value = i;
-                o.textContent = w.name || w?.witnessBackground?.personalDetails?.fullName || `Witness ${i + 1}`;
-                dom.witnessSelector.appendChild(o);
-            });
-            dom.witnessSelectorCard.style.display = 'block';
+            if (dom.witnessSelector) {
+                dom.witnessSelector.innerHTML = '';
+                appState.witnesses.forEach((w, i) => {
+                    const o = document.createElement('option');
+                    o.value = i;
+                    o.textContent = w.name || w?.witnessBackground?.personalDetails?.fullName || `Witness ${i + 1}`;
+                    dom.witnessSelector.appendChild(o);
+                });
+            }
+            if (dom.witnessSelectorCard) dom.witnessSelectorCard.style.display = 'block';
         } else {
             appState.witnesses = [data];
-            dom.witnessSelectorCard.style.display = 'none';
+            if (dom.witnessSelectorCard) dom.witnessSelectorCard.style.display = 'none';
         }
         appState.activeWitnessIndex = 0;
         resetChat();
     }
 
-    dom.providerSelect.addEventListener('change', (e) => {
-        appState.providerId = e.target.value;
-        appState.apiKey = localStorage.getItem(`llm_${appState.providerId}_key`) || '';
-        dom.apiKeyInput.value = appState.apiKey;
-        renderModelOptions();
-    });
+    // Event Listeners
+    if (dom.providerSelect) {
+        dom.providerSelect.addEventListener('change', (e) => {
+            console.log('Provider changed to:', e.target.value);
+            appState.providerId = e.target.value;
+            appState.apiKey = localStorage.getItem(`llm_${appState.providerId}_key`) || '';
+            if (dom.apiKeyInput) dom.apiKeyInput.value = appState.apiKey;
+            renderModelOptions();
+        });
+    }
 
-    dom.apiKeyInput.addEventListener('change', (e) => {
-        appState.apiKey = e.target.value;
-        localStorage.setItem(`llm_${appState.providerId}_key`, appState.apiKey);
-    });
+    if (dom.apiKeyInput) {
+        dom.apiKeyInput.addEventListener('change', (e) => {
+            appState.apiKey = e.target.value;
+            localStorage.setItem(`llm_${appState.providerId}_key`, appState.apiKey);
+        });
+    }
 
-    dom.modelSelect.addEventListener('change', (e) => { appState.model = e.target.value; });
-    dom.judgeModeCheckbox.addEventListener('change', (e) => { appState.isJudgePresent = e.target.checked; });
-    dom.fileLoaderInput.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if (!f) return;
-        const r = new FileReader();
-        r.onload = (ev) => {
-            try {
-                const p = JSON.parse(ev.target.result);
-                loadWitnessData(p);
-                dom.scenarioSelector.value = "-1";
-            } catch (err) {
-                console.error("JSON Parse Error:", err);
-                appState.messages.push({ role: 'assistant', content: `Error: Invalid JSON file.`, isOoc: true });
-                renderChatMessages();
+    if (dom.modelSelect) {
+        dom.modelSelect.addEventListener('change', (e) => { 
+            appState.model = e.target.value; 
+        });
+    }
+
+    if (dom.judgeModeCheckbox) {
+        dom.judgeModeCheckbox.addEventListener('change', (e) => { 
+            appState.isJudgePresent = e.target.checked; 
+        });
+    }
+
+    if (dom.fileLoaderInput) {
+        dom.fileLoaderInput.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = (ev) => {
+                try {
+                    const p = JSON.parse(ev.target.result);
+                    loadWitnessData(p);
+                    if (dom.scenarioSelector) dom.scenarioSelector.value = "-1";
+                } catch (err) {
+                    console.error("JSON Parse Error:", err);
+                    appState.messages.push({ role: 'assistant', content: `Error: Invalid JSON file.`, isOoc: true });
+                    renderChatMessages();
+                }
+            };
+            r.readAsText(f);
+        });
+    }
+
+    if (dom.scenarioSelector) {
+        dom.scenarioSelector.addEventListener('change', (e) => {
+            const index = parseInt(e.target.value, 10);
+            if (index >= 0) {
+                const encodedData = PRE_BUILT_SCENARIOS[index];
+                try {
+                    const decodedData = atob(encodedData);
+                    const jsonData = JSON.parse(decodedData);
+                    loadWitnessData(jsonData);
+                    if (dom.fileLoaderInput) dom.fileLoaderInput.value = "";
+                } catch (err) {
+                    console.error("Failed to decode or parse scenario:", err);
+                    appState.messages.push({ role: 'assistant', content: `Error: Could not load the selected scenario. It might be corrupted.`, isOoc: true });
+                    renderChatMessages();
+                }
             }
-        };
-        r.readAsText(f);
-    });
-
-    dom.scenarioSelector.addEventListener('change', (e) => {
-        const index = parseInt(e.target.value, 10);
-        if (index >= 0) {
-            const encodedData = PRE_BUILT_SCENARIOS[index];
-            try {
-                const decodedData = atob(encodedData);
-                const jsonData = JSON.parse(decodedData);
-                loadWitnessData(jsonData);
-                dom.fileLoaderInput.value = "";
-            } catch (err) {
-                console.error("Failed to decode or parse scenario:", err);
-                appState.messages.push({ role: 'assistant', content: `Error: Could not load the selected scenario. It might be corrupted.`, isOoc: true });
-                renderChatMessages();
-            }
-        }
-    });
+        });
+    }
 
     if (dom.witnessSelector) {
         dom.witnessSelector.addEventListener('change', (e) => {
@@ -864,29 +1015,57 @@ ${wt}
         });
     }
 
-    dom.modeToggleCheckbox.addEventListener('change', (e) => { appState.isOocMode = e.target.checked; updateUI(); });
-    dom.getSummaryButton.addEventListener('click', handleGetSummary);
-    dom.getCaseSummaryButton.addEventListener('click', handleGetCaseSummary);
-    dom.chatInput.addEventListener('input', () => {
-        dom.chatInput.style.height = 'auto';
-        dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px';
-    });
-    dom.sendButton.addEventListener('click', handleSendMessage);
-    dom.saveTranscriptButton.addEventListener('click', handleSaveTranscript);
-    dom.chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
+    if (dom.modeToggleCheckbox) {
+        dom.modeToggleCheckbox.addEventListener('change', (e) => { 
+            appState.isOocMode = e.target.checked; 
+            updateUI(); 
+        });
+    }
+
+    if (dom.getSummaryButton) {
+        dom.getSummaryButton.addEventListener('click', handleGetSummary);
+    }
+
+    if (dom.getCaseSummaryButton) {
+        dom.getCaseSummaryButton.addEventListener('click', handleGetCaseSummary);
+    }
+
+    if (dom.chatInput) {
+        dom.chatInput.addEventListener('input', () => {
+            dom.chatInput.style.height = 'auto';
+            dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px';
+        });
+        
+        dom.chatInput.addEventListener('keydown', (e) => { 
+            if (e.key === 'Enter' && !e.shiftKey) { 
+                e.preventDefault(); 
+                handleSendMessage(); 
+            } 
+        });
+    }
+
+    if (dom.sendButton) {
+        dom.sendButton.addEventListener('click', handleSendMessage);
+    }
+
+    if (dom.saveTranscriptButton) {
+        dom.saveTranscriptButton.addEventListener('click', handleSaveTranscript);
+    }
 
     function initialize() {
+        console.log('Initializing application...');
         renderProviderOptions();
-        const defaultProviderId = dom.providerSelect.value || 'openai';
+        const defaultProviderId = dom.providerSelect ? dom.providerSelect.value || 'openai' : 'openai';
         appState.providerId = defaultProviderId;
         appState.apiKey = localStorage.getItem(`llm_${defaultProviderId}_key`) || '';
-        dom.apiKeyInput.value = appState.apiKey;
+        if (dom.apiKeyInput) dom.apiKeyInput.value = appState.apiKey;
         renderModelOptions();
         updateUI();
+        console.log('Application initialized successfully');
     }
 
     initialize();
 });
-
+</script>
 </body>
 </html>
