@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seth Chandler's Deposition Trainer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <style>
         :root {
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -410,6 +411,12 @@
             <div class="form-group">
                 <label for="provider">Provider</label>
                 <select id="provider"></select>
+                <div id="ollamaSetupInfo" style="display: none; margin-top: 8px; padding: 10px; background-color: #e8f4fd; border: 1px solid #b3d7ff; border-radius: 4px; font-size: 14px;">
+                    <strong>⚠️ Local LLM Setup Required</strong><br>
+                    Ollama requires installation and high-end hardware (16GB+ RAM, preferably with GPU).<br>
+                    <a href="https://github.com/SethChandlerDepositionTrainer/ollama-setup" target="_blank" style="color: #1877f2;">📖 View detailed setup instructions</a> | 
+                    <button id="testOllamaConnection" class="button" style="padding: 4px 8px; font-size: 12px; margin-left: 8px;">Test Connection</button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="apiKey">API Key</label>
@@ -613,26 +620,112 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             },
         },
+        ollama: {
+            label: "Ollama (Local - Privacy Mode)",
+            requiresSetup: true,
+            models: [
+                { name: "llama3.1:8b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                { name: "qwen2.5:7b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                { name: "mistral:7b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                { name: "llama3.1:70b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } }
+            ],
+            defaultModel: "llama3.1:8b",
+            chat: async ({ model, messages }) => {
+                try {
+                    const response = await fetch("http://localhost:11434/v1/chat/completions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            model, 
+                            messages, 
+                            stream: false,
+                            options: {
+                                temperature: 0.7,
+                                top_p: 0.9
+                            }
+                        }),
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Ollama server error (${response.status}): ${response.statusText}. Is Ollama running?`);
+                    }
+                    const data = await response.json();
+                    return {
+                        message: data.choices[0].message,
+                        usage: { inputTokens: 0, outputTokens: 0 } // Local = free
+                    };
+                } catch (e) {
+                    if (e.message.includes('fetch')) {
+                        throw new Error("Cannot connect to Ollama. Please ensure Ollama is installed and running on localhost:11434");
+                    }
+                    throw e;
+                }
+            },
+        },
     };
 
-    // Simple markdown to HTML converter
     // Markdown to HTML converter using marked.js
-function markdownToHtml(text) {
-    if (!text || typeof text !== 'string') return text;
-    
-    // Check if the text contains markdown-like patterns
-    const hasMarkdown = /^#{1,3}\s|^\*\s|^-\s|^\d+\.\s|\*\*.*?\*\*|\*.*?\*|`.*?`|```[\s\S]*?```/m.test(text);
-    if (!hasMarkdown) return text;
-    
-    try {
-        return marked.parse(text);
-    } catch (e) {
-        console.error('Markdown parsing error:', e);
-        return text; // fallback to plain text
+    function markdownToHtml(text) {
+        if (!text || typeof text !== 'string') return text;
+        
+        // Check if the text contains markdown-like patterns
+        const hasMarkdown = /^#{1,3}\s|^\*\s|^-\s|^\d+\.\s|\*\*.*?\*\*|\*.*?\*|`.*?`|```[\s\S]*?```/m.test(text);
+        if (!hasMarkdown) return text;
+        
+        try {
+            // Use marked.js if available, otherwise fallback
+            if (typeof marked !== 'undefined') {
+                return marked.parse(text);
+            } else {
+                // Fallback: basic bold and header parsing
+                let html = text;
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+                html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+                return html;
+            }
+        } catch (e) {
+            console.error('Markdown parsing error:', e);
+            return text;
+        }
     }
-}
-    
- 
+
+    // Test Ollama connection
+    async function testOllamaConnection() {
+        const testButton = document.getElementById('testOllamaConnection');
+        if (!testButton) return;
+        
+        testButton.textContent = 'Testing...';
+        testButton.disabled = true;
+        
+        try {
+            const response = await fetch("http://localhost:11434/api/tags", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const modelCount = data.models?.length || 0;
+                testButton.textContent = `✅ Connected (${modelCount} models)`;
+                testButton.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    testButton.textContent = 'Test Connection';
+                    testButton.style.backgroundColor = '';
+                    testButton.disabled = false;
+                }, 3000);
+            } else {
+                throw new Error('Server responded with error');
+            }
+        } catch (e) {
+            testButton.textContent = '❌ Connection Failed';
+            testButton.style.backgroundColor = '#dc3545';
+            setTimeout(() => {
+                testButton.textContent = 'Test Connection';
+                testButton.style.backgroundColor = '';
+                testButton.disabled = false;
+            }, 3000);
+        }
+    }
 
     // Get DOM elements
     const dom = {
@@ -655,7 +748,9 @@ function markdownToHtml(text) {
         sendButton: document.getElementById('sendButton'),
         saveTranscriptButton: document.getElementById('saveTranscriptButton'),
         totalTokensSpan: document.getElementById('totalTokens'),
-        estimatedCostSpan: document.getElementById('estimatedCost')
+        estimatedCostSpan: document.getElementById('estimatedCost'),
+        ollamaSetupInfo: document.getElementById('ollamaSetupInfo'),
+        testOllamaConnection: document.getElementById('testOllamaConnection')
     };
 
     // Verify DOM elements exist
@@ -1029,8 +1124,23 @@ ${wt}
             appState.providerId = e.target.value;
             appState.apiKey = localStorage.getItem(`llm_${appState.providerId}_key`) || '';
             if (dom.apiKeyInput) dom.apiKeyInput.value = appState.apiKey;
+            
+            // Show/hide Ollama setup info
+            if (dom.ollamaSetupInfo) {
+                dom.ollamaSetupInfo.style.display = (e.target.value === 'ollama') ? 'block' : 'none';
+            }
+            
+            // Hide API key field for Ollama (local doesn't need API key)
+            if (dom.apiKeyInput && dom.apiKeyInput.parentElement) {
+                dom.apiKeyInput.parentElement.style.display = (e.target.value === 'ollama') ? 'none' : 'block';
+            }
+            
             renderModelOptions();
         });
+    }
+
+    if (dom.testOllamaConnection) {
+        dom.testOllamaConnection.addEventListener('click', testOllamaConnection);
     }
 
     if (dom.apiKeyInput) {
