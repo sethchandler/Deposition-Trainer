@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seth Chandler's Deposition Trainer</title>
+    <style>
+        :root {
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #1c1e21;
+            --label-color: #606770;
+            --border-color: #ced0d4;
+            --input-background: #f5f6f7;
+            --button-background: #1877f2;
+            --button-text-color: #ffffff;
+            --user-bubble-background: #0084ff;
+            --assistant-bubble-background: #e4e6eb;
+            --meta-bubble-background: #fffbe6;
+            --meta-bubble-border: #ffe58f;
+            --disabled-color: #bec3c9;
+            --toggle-on-color: #1877f2;  /* Blue for Coach */
+            --toggle-off-color: #28a745; /* Green for Witness */
+        }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--label-color);
+            margin-bottom: 6px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-background);
+            font-size: 16px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .form-group input[type="file"] {
+            background-color: transparent;
+            padding: 8px 0;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: normal;
+        }
+        .button {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--button-background);
+            color: var(--button-text-color);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .button-secondary {
+            background-color: #e4e6eb;
+            color: #050505;
+            font-size: 14px;
+            padding: 6px 12px;
+        }
+        .button:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+        }
+        /* Find and replace the entire #chat-window rule with this one */
+            #chat-window {
+                display: flex;
+                flex-direction: column;
+                height: 75vh; /* This sets the card's height to 75% of the screen height */
+                min-height: 400px; /* Ensures it's never too small */
+            }
+
+        
+        #chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            background-color: #fff;
+            min-height: 0; /* Add this line */
+}
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
+        }
+        .chat-message {
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+        .user-message {
+            background-color: var(--user-bubble-background);
+            color: white;
+            align-self: flex-end;
+        }
+        .assistant-message {
+            background-color: var(--assistant-bubble-background);
+            color: #050505;
+            align-self: flex-start;
+        }
+        .meta-message {
+            background-color: var(--meta-bubble-background);
+            border: 1px solid var(--meta-bubble-border);
+            color: #573a00;
+            align-self: stretch;
+            max-width: 100%;
+        }
+        .typing-indicator {
+            padding: 8px 12px;
+            font-style: italic;
+            color: var(--label-color);
+        }
+        #chat-input-area {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        #chatInput {
+            flex-grow: 1;
+            resize: none;
+            overflow-y: hidden;
+            line-height: 1.5;
+            font-size: 17px;
+        }
+        #chat-input-area #sendButton {
+            width: auto;
+            padding: 0 20px;
+            height: 46px;
+        }
+        .app-header {
+            text-align: center;
+        }
+        .toggle-switch-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-off-color);
+            transition: .4s;
+            border-radius: 28px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--toggle-on-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        #cost-details {
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+            color: var(--label-color);
+            background-color: var(--input-background);
+            padding: 10px;
+            border-radius: 6px;
+        }
+        #cost-details p {
+            margin: 0;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .summary-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+            border-radius: 5px;
+        }
+        .summary-slider:hover {
+            opacity: 1;
+        }
+        .summary-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--button-background);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .summary-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--button-background);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .divider {
+            text-align: center;
+            margin: 10px 0;
+            color: var(--label-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="app-header">
+            <h1 style="font-size: 28px; margin: 0 0 4px 0;">Seth Chandler's Deposition Trainer v 0.82</h1>
+            <p style="font-size: 16px; color: var(--label-color); margin: 0;">An educational tool for law students</p>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">1. LLM & Deposition Settings</h2>
+            <div class="form-group">
+                <label for="provider">Provider</label>
+                <select id="provider"></select>
+            </div>
+            <div class="form-group">
+                <label for="apiKey">API Key</label>
+                <input type="password" id="apiKey" placeholder="Paste your key here">
+            </div>
+            <div class="form-group">
+                <label for="model">Model</label>
+                <select id="model"></select>
+            </div>
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="judgeMode">
+                <label for="judgeMode">A Judge is present to rule on objections.</label>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">2. Choose a Scenario</h2>
+            <div class="form-group">
+                <label>Start with a Pre-Built Scenario</label>
+                <select id="scenarioSelector">
+                    <option value="-1" disabled selected>Select a case...</option>
+                    <option value="0">Homicide Case: The Eyewitness with a Secret</option>
+                    <option value="1">Domestic Violence Case: The Observant Neighbor</option>
+                    <option value="2">Employment Case: The HR Manager</option>
+                </select>
+            </div>
+            <p class="divider">OR</p>
+            <div class="form-group">
+                <label for="fileLoader">Upload Your Own Case File (.json)</label>
+                <input type="file" id="fileLoader" accept=".json">
+            </div>
+        </div>
+        
+        <div class="card" id="witnessSelectorCard" style="display: none;">
+            <h2 class="card-title">3. Select Witness</h2>
+            <div class="form-group">
+                <select id="witnessSelector"></select>
+            </div>
+        </div>
+        
+       <div class="card" id="intelCard" style="display: none;">
+    <h2 class="card-title">4. Pre-Deposition Intel</h2>
+    <div class="form-group">
+        <label for="summaryDetailSlider">Summary Detail Level</label>
+        <div class="slider-container">
+            <span>Minimal</span>
+            <input type="range" min="1" max="3" value="2" class="summary-slider" id="summaryDetailSlider">
+            <span>Maximal</span>
+        </div>
+    </div>
+    <!-- NEW: Button container for better layout -->
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="getSummaryButton" class="button" style="flex: 1;">Get Witness Summary</button>
+        <button id="getCaseSummaryButton" class="button" style="flex: 1;">Get Case Summary</button>
+    </div>
+</div>
+
+        <div class="card" id="costTrackerCard">
+            <h2 class="card-title" style="margin-bottom: 10px;">Session Usage & Cost Estimate</h2>
+            <div id="cost-details">
+                <p><strong>Total Tokens:</strong> <span id="totalTokens">0</span></p>
+                <p><strong>Estimated Cost:</strong> <span id="estimatedCost">$0.000000</span></p>
+            </div>
+        </div>
+
+        <div class="card" id="chat-window">
+            <div class="card-header">
+                <h2 class="card-title" id="chat-title">Deposition</h2>
+                <button id="saveTranscriptButton" class="button button-secondary" disabled>Save Transcript</button>
+            </div>
+            <div id="chat-history"></div>
+            <div id="chat-input-area">
+                <div class="toggle-switch-container">
+                    <span>Witness</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="modeToggleCheckbox">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Coach</span>
+                </div>
+                <textarea id="chatInput" placeholder="Choose or upload a scenario to begin..." rows="2" disabled></textarea>
+                <button id="sendButton" class="button" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const PRE_BUILT_SCENARIOS = [
+    // Homicide Case: The Eyewitness with a Secret (John Sterling)
+    "eyAid2l0bmVzc1Byb2ZpbGUiOiB7ICJ3aXRuZXNzSWQiOiAiV1MtMjAyNC0wNy0yMy0wMDEiLCAiY2FzZVJlZmVyZW5jZSI6ICJIb21pY2lkZS1QS00tMjAyNC0wMzEiIH0sICJ3aXRuZXNzQmFja2dyb3VuZCI6IHsgInBlcnNvbmFsRGV0YWlscyI6IHsgImZ1bGxOYW1lIjogIkpvaG5hdGhhbiAnSm9objcgU3RlcmxpbmciLCAiYWdlIjogNDAsICJvY2N1cGF0aW9uIjogIlZpY2UgUHJlc2lkZW50IG9mIFJlZ2lvbmFsIFNhbGVzLCAnVGV4YWNvcnAgU29sdXRpb25zJyIsICJyZXNpZGVuY2UiOiAiTWVtb3JpYWwsIEhvdXN0b24sIFRYIiB9LCAicHJvZmVzc2lvbmFsTGlmZSI6IHsgInJlcHV0YXRpb24iOiAiSGlnaGx5IHJlc3BlY3RlZCwgZGVwZW5kYWJsZSwgZXRoaWNhbCwgYW5kIGZhbWlseS1vcmllbnRlZC4iIH0sICJwZXJzb25hbExpZmVBbmRSZWxhdGlvbnNoaXBzIjogeyAibWFycmlhZ2UiOiAiU3RyYWluZWQuIiwgImFmZmFpciI6ICJJbnZvbHZlZCBpbiBhIHNpeC1tb250aCBhZmZhaXIgd2l0aCBhIGp1bmlvciBjb2xsZWFndWUsICdDaGxvZScuIFRlcnJpZmllZCBvZiBkaXNjb3ZlcnkuIiB9IH0sICJ3aXRuZXNzTW90aXZhdGlvbnMiOiB7ICJwcmltYXJ5TW90aXZhdGlvblRvQ29uY2VhbCI6ICJNdXN0IHByb3RlY3QgdGhlIHNlY3JldCBvZiBoaXMgYWZmYWlyLiBIZSBjYW5ub3QgcGxhY2UgaGltc2VsZiBhdCB0aGUgJ1N0YXJsaWdodCBNb3RlbCcgd2l0aG91dCBpbnZpdGluZyBxdWVzdGlvbnMgaGUgY2Fubm90IGFuc3dlciB0cnV0aGZ1bGx5LiIsICJzdHJhdGVneU9mUGFydGlhbERpc2Nsb3N1cmUiOiAiSGUgd2lsbCBwcm92aWRlIGluZm9ybWF0aW9uIGFib3V0IHRoZSBwZXJwZXRyYXRvciBidXQgd2lsbCBsaWUgYWJvdXQgaGlzIHJlYXNvbiBmb3IgYmVpbmcgYXQgdGhlIG1vdGVsLCBjbGFpbWluZyBoZSBwdWxsZWQgb3ZlciB0byBuYXAuIiwgInBlcmp1cnlSaXNrIjogMC43NSB9LCAiZnVsbFdpdG5lc3NJbmZvcm1hdGlvbiI6IHsgIm9mZmljaWFsU3RhdGVtZW50U3VtbWFyeSI6ICJXaXRuZXNzIGNsYWltcyBoZSB3YXMgZHJpdmluZyBob21lIGxhdGUgZnJvbSBhICdjbGllbnQgZGlubmVyJywgZmVsdCB0aXJlZCwgYW5kIHB1bGxlZCBpbnRvIHRoZSBtb3RlbCBsb3QgdG8gbmFwLiBGcm9tIGhpcyBjYXIsIGhlIHdpdG5lc3NlZCB0aGUgaW5jaWRlbnQuIiwgIm5hcnJhdGl2ZU9mRXZlbnRzIjogeyAidGhlSW5jaWRlbnQiOiAiSGVhcmQgYSBsb3VkIGFyZ3VtZW50IGJldHdlZW4gdHdvIG1lbi4gV2F0Y2hlZCB0aGUgbGFyZ2VyIG1hbiBzdGFiIHRoZSBzbWFsbGVyIG1hbi4gVGhlIHBlcnBldHJhdG9yJ3MgZmFjZSB3YXMgY2xlYXJseSB2aXNpYmxlIGluIHRoZSBsaWdodCBmcm9tIHRoZSBtb3RlbCBvZmZpY2Ugd2luZG93LiIsICJ0aGVBZnRlcm1hdGgiOiAiUGFyYWx5emVkIGJ5IGZlYXIgb2YgZXhwb3N1cmUsIGhlIGRpZCBub3QgY2FsbCA5MTEuIEhlIGRyb3ZlIGF3YXkgYW5kIGNvbnRhY3RlZCBwb2xpY2UgdGhlIG5leHQgZGF5IHZpYSBhIHRpcCBsaW5lIHVzaW5nIGEgYnVybmVyIHBob25lLiIgfSwgImRlc2NyaXB0aW9uT2ZQZXJwZXRyYXRvciI6IHsgInBoeXNpY2FsIjogIldoaXRlIG1hbGUsIGxhdGUgMjBzL2Vhcmx5IDMwcywgc3RvY2t5IGJ1aWxkLCBzaG9ydCBkYXJrIGhhaXIsIHdpdGggYSBwcm9taW5lbnQgc2NhciB0aHJvdWdoIGhpcyBsZWZ0IGV5ZWJyb3cuIiwgImNvbmZpZGVuY2VMZXZlbCI6ICI4LzEwLCBkZXNwaXRlIG5vdCB3ZWFyaW5nIGhpcyBwcmVzY3JpcHRpb24gZ2xhc3NlcyBmb3IgZGlzdGFuY2UuIiB9LCAiaW5jb25zaXN0ZW5jaWVzQW5kRXZhc2lvbnMiOiB7ICJyZWFzb25Gb3JQcmVzZW5jZSI6ICJUaGUgJ25hcHBpbmcnIHN0b3J5IGlzIGEgZmFicmljYXRpb24uIEhlIHdpbGwgYmVjb21lIGRlZmVuc2l2ZSBpZiBwcmVzc2VkLiIsICJ0aW1lbGluZSI6ICJIZSB3aWxsIGJlIHZhZ3VlIGFib3V0IHRoZSAnY2xpZW50IGRpbm5lcicgdG8gaGlkZSB0aGUgdHdvLWhvdXIgZ2FwIHdoZW4gaGUgd2FzIHdpdGggaGlzIG1pc3RyZXNzLiIsICJ2aXN1YWxBY3VpdHkiOiAiSGUgd2lsbCBkb3ducGxheSBoaXMgbmVlZCBmb3IgZ2xhc3Nlcy4iIH0gfSB9",
+    // Domestic Violence Case: The Observant Neighbor (Margaret Chen)
+    "eyAid2l0bmVzc1Byb2ZpbGUiOiB7ICJ3aXRuZXNzSWQiOiAiV1MtMjAyNC0wNy0yMy0wMDIiLCAiY2FzZVJlZmVyZW5jZSI6ICJDaXZpbC1EVi0yMDI0LTA0NyIgfSwgIndpdG5lc3NCYWNrZ3JvdW5kIjogeyAicGVyc29uYWxEZXRhaWxzIjogeyAiZnVsbE5hbWUiOiAiTWFyZ2FyZXQgJ01hZ2dpZScgUnV0aCBDaGVuIiwgImFnZSI6IDUyLCAib2NjdXBhdGlvbiI6ICJSZXRpcmVkIEVsZW1lbnRhcnkgU2Nob29sIFRlYWNoZXIiLCAicmVzaWRlbmNlIjogIk5leHQgZG9vciB0byB0aGUgdmljdGltLiIgfSwgInBlcnNvbmFsTGlmZUFuZFJlbGF0aW9uc2hpcHMiOiB7ICJwZXJzb25hbFZhbHVlcyI6ICJTdHJvbmdseSBiZWxpZXZlcyBpbiBwcm90ZWN0aW5nIHZpY3RpbXMsIGEgdmFsdWUgZnJvbSBoZXIgdGVhY2hpbmcgY2FyZWVyLiBHcmV3IHVwIHdpdGggYW4gYWJ1c2l2ZSBmYXRoZXIsIG1ha2luZyBoZXIgc2Vuc2l0aXZlIHRvIHNpZ25zIG9mIGFidXNlLiIsICJjb25mbGljdEF2b2lkYW5jZSI6ICJEZXNwaXRlIHByb3RlY3RpdmUgaW5zdGluY3RzLCBzaGUgaXMgY29uZmxpY3QtYXZlcnNlIGFuZCBmZWFycyBkaXJlY3QgY29uZnJvbnRhdGlvbi4iIH0gfSwgIndpdG5lc3NNb3RpdmF0aW9ucyI6IHsgInByaW1hcnlNb3RpdmF0aW9uVG9UZXN0aWZ5IjogIkZlZWxzIGEgbW9yYWwgb2JsaWdhdGlvbiB0byBzcGVhayB0aGUgdHJ1dGggYWJvdXQgd2hhdCBzaGUgd2l0bmVzc2VkLiIsICJjb25mbGljdGluZ01vdGl2YXRpb25Gb3JTYWZldHkiOiAiR2VudWluZWx5IGFmcmFpZCBvZiByZXRhbGlhdGlvbiBmcm9tIHRoZSBwZXJwZXRyYXRvciwgSmF5IERvb2xleSwgd2hvbSBzaGUga25vd3MgdG8gYmUgdmlvbGVudC4iLCAiZG9jdW1lbnRhdGlvbiI6ICJBcyBhIHRlYWNoZXIsIHNoZSBrZXB0IGEgZGV0YWlsZWQsIGhpZGRlbiBqb3VybmFsIHdpdGggZGF0ZXMsIHRpbWVzLCBhbmQgZGVzY3JpcHRpb25zIG9mIGluY2lkZW50cy4iIH0sICJmdWxsV2l0bmVzc0luZm9ybWF0aW9uIjogeyAib2ZmaWNpYWxTdGF0ZW1lbnRTdW1tYXJ5IjogIldpdG5lc3Mgc3RhdGVzIHNoZSBvYnNlcnZlZCBtdWx0aXBsZSBpbmNpZGVudHMgb2YgZG9tZXN0aWMgdmlvbGVuY2UsIHN0YWxraW5nLCBhbmQgaGFyYXNzbWVudCBieSBKYXkgRG9vbGV5IGFnYWluc3QgaGVyIG5laWdoYm9yIGJldHdlZW4gQXByaWwgYW5kIERlY2VtYmVyIDIwMDcuIiwgIm5hcnJhdGl2ZU9mRXZlbnRzIjogeyAiYXByaWxLbmlmZUluY2lkZW50IjogIldpdG5lc3NlZCBEb29sZXkgaG9sZCBhIGtuaWZlIHRvIGhpcyBvd24gdGhyb2F0IGFuZCBjdXQgaGlzIHdyaXN0IGF0IHRoZSB2aWN0aW0ncyBmcm9udCBnYXRlLiBTaGUgY2FsbGVkIDkxMS4iLCAibm92ZW1iZXJBc3NhdWx0IjogIkZyb20gaGVyIGtpdGNoZW4gd2luZG93LCBzaGUgaGFkIGEgY2xlYXIgdmlldyBvZiBEb29sZXkgdmlvbGVudGx5IGFzc2F1bHRpbmcgdGhlIHZpY3RpbSBpbiB0aGUgYmFja3lhcmQgZm9yIDE1LTIwIG1pbnV0ZXMuIFNoZSB3YXMgdG9vIHRlcnJpZmllZCB0byBjYWxsIHRoZSBwb2xpY2UgZHVyaW5nIHRoZSBhc3NhdWx0LiIsICJzdGFsa2luZyI6ICJPYnNlcnZlZCBEb29sZXkncyB2ZWhpY2xlIHdhdGNoaW5nIHRoZSBob3VzZSBhdCBvZGQgaG9ycyBhbmQgZm9sbG93aW5nIHRoZSB2aWN0aW0ncyBjYXIuIiB9LCAiZGVzY3JpcHRpb25PZlBlcnBldHJhdG9yIjogeyAicGh5c2ljYWwiOiAiV2hpdGUgbWFsZSwgYXBwcm94LiAzNS00MCwgbWVkaXVtIHRvIHN0b2NreSBidWlsZCwgYnJvd24gaGFpciwgdmlzaWJsZSB0YXR0b29zIG9uIGJvdGggYXJtcy4iLCAiY29uZmlkZW5jZUxldmVsIjogIlZlcnkgaGlnaCAoOS8xMCkgaW4gaGVyIG9ic2VydmF0aW9ucywgd2hpY2ggc2hlIGRvY3VtZW50ZWQgaW4gaGVyIGpvdXJuYWwuIiB9LCAiaW5jb25zaXN0ZW5jaWVzQW5kTGltaXRhdGlvbnMiOiB7ICJyZWdyZXRPdmVySW5hY3Rpb24iOiAiRmVlbHMgdHJlbWVuZG91cyBndWlsdCBmb3Igbm90IGNhbGxpbmcgdGhlIHBvbGljZSBkdXJpbmcgdGhlIG1vc3Qgc2V2ZXJlIGFzc2F1bHQgaW4gTm92ZW1iZXIuIiB9IH0gfQ==",
+    // Employment Case: The HR Manager (Susan Miller)
+    "eyAid2l0bmVzc1Byb2ZpbGUiOiB7ICJ3aXRuZXNzSWQiOiAiSFJNLTIwMjUtMDctMjMtMDAzIiwgImNhc2VSZWZlcmVuY2UiOiAiQ2xhcmsgdi4gRW5lci1TekUgU29sdXRpb25zIiB9LCAid2l0bmVzc0JhY2tncm91bmQiOiB7ICJwZXJzb25hbERldGFpbHMiOiB7ICJmdWxsTmFtZSI6ICJTdXNhbiBNaWxsZXIiLCAiYWdlIjogNDgsICJvY2N1cGF0aW9uIjogIkRpcmVjdG9yIG9mIEh1bWFuIFJlc291cmNlcywgRW5lci1UZWsgU29sdXRpb25zIiwgInJlc2lkZW5jZSI6ICJUaGUgV29vZGxhbmRzLCBUWCIgfSwgInByb2Zlc3Npb25hbExpZmUiOiB7ICJjYXJlZXJUcmFqZWN0b3J5IjogIjIwKyB5ZWFycyBpbiBIUiwgOCBhdCBFbmVyLVRlayAoYSBzbWFsbCBob3VzdG9uIGVuZXJneSBmaXJtKS4gS25vd24gZm9yIGJlaW5nIGZpcm0sIHByb2Nlc3Mtb3JpZW50ZWQsIGFuZCBhIHN0YXVuY2ggZGVmZW5kZXIgb2YgY29tcGFueSBwb2xpY3kuIiwgInJlcHV0YXRpb24iOiAiUHJvZmVzc2lvbmFsIGFuZCBFRmZpY2llbnQsIGJ1dCBub3Qgd2FybS4gU2VlbiBhcyBhbiBlbmZvcmNlciBvZiBydWxlcyB3aG9zZSBwcmltYXJ5IHJvbGUgaXMgdG8gcHJvdGVjdCB0aGUgY29tcGFueSBmcm9tIGxlZ2FsIHJpc2suIiB9IH0sICJ3aXRuZXNzTW90aXZhdGlvbnMiOiB7ICJwcmltYXJ5TW90aXZhdGlvbiI6ICJUbyBkZWZlbmQgaGVyIGRlY2lzaW9uIGFuZCB0aGUgY29tcGFueS4gU2hlIGdlbnVpbmVseSBiZWxpZXZlcyB0aGUgdGVybWluYXRpb24gb2YgdGhlIHBsYWludGlmZiwgRGF2ZSBDbGFyaywgd2FzIGp1c3RpZmllZCBiYXNlZCBvbiBwZXJmb3JtYW5jZS4iLCAia2V5Q29uY2VhbG1lbnQiOiAiRGVzcGVyYXRlbHkgd2FudHMgdG8gaGlkZSBhICdzdHJheSByZW1hcmsnIHNoZSBtYWRlIHRvIGEgY29sbGVhZ3VlIGEgbW9udGggYmVmb3JlIHRoZSBmaXJpbmc6ICdUaGUgcmVhbCBwcm9ibGVtIGlzIHRoYXQgRGF2aWQgQ2xhcmsgYXMganVzdCBnb3R0ZW4gb2xkLicgU2hlIGtub3dzIHRoaXMgY29tbWVudCBpcyBsZWdhbGx5IHRveGljLiIsICJzdHJhdGVneSI6ICJTdGljayB0byB0aGUgb2ZmaWNpYWwgcmVjb3JkOiBwZXJmb3JtYW5jZSByZXZpZXdzLCB0YXJkaW5lc3MgbG9ncywgZXRjLiBJZiBhc2tlZCBhYm91dCB0aGUgcmVtYXJrLCBmaXJzdCBkZW55IG9yIG5vdCByZWNhbGwuIElmIHByZXNzZWQgaGFyZCwgYWRtaXQgaXQgYnV0IGZyYW1lIGl0IGFzIGEgcmVncmV0dGFibGUsIG91dC1vZi1jb250ZXh0IGNvbW1lbnQgdGhhdCBoYWQgbm8gYmVhcmluZyBvbiB0aGUgb2ZmaWNpYWwsIGRhdGEtZHJpdmVuIGRlY2lzaW9uLiIsICJwZXJqdXJ5UmlzayI6IDAuNjAgfSwgImZ1bGxXaXRuZXNzSW5mb3JtYXRpb24iOiB7ICJvZmZpY2lhbFJlYXNvbkZvclRlcm1pbmF0aW9uIjogIlRlcm1pbmF0aW9uIG9mIERhdmUgQ2xhcmsgKDYyLCBkYXRhIGFuYWx5c3QpIHdhcyBiYXNlZCBvbiBkZWNsaW5pbmcgcGVyZm9ybWFuY2U6IDggaW5zdGFuY2VzIG9mIHRhcmRpbmVzcyBsYXN0IHF1YXJ0ZXIsIG1pc3NlZCBkZWFkbGluZXMgb24gdHdvIG1ham9yIHByb2plY3RzLCBhbmQgYW4gaW5jcmVhc2UgaW4gZXJyb3JzIGluIGhpcyByZXBvcnRzLiIsICJ0aGVTdHJheVJlbWFya0luY2lkZW50IjogIlNhaWQgJ3RoZSByZWFsIHByb2JsZW0gaXMgdGhhdCBEYXZpZCBDbGFyayBoYXMganVzdCBnb3R0ZW4gb2xkJyB0byB0aGUgaGVhZCBvZiBBbmFseXRpY3MgaW4gYSBtb21lbnQgb2YgZnJ1c3RyYXRpb24uIFNoZSBpbW1lZGlhdGVseSByZWdyZXR0ZWQgaXQuIiwgInBsYWludGlmZnNQZXJmb3JtYW5jZSI6ICJDbGFyayB3YXMgYSBzb2xpZCBlbXBsb3llZSBmb3IgMjArIHllYXJzLiBIaXMgcmV2aWV3cyBzbGlwcGVkIGZyb20gJ01lZXRzIEV4cGVjdGF0aW9ucycgdG8gJ05lZWRzIEltcHJvdmVtZW50JyBvdmVyIHRoZSBsYXN0IHRocmVlIHllYXJzLiBIZSB3YXMgb24gYSBQZXJmb3JtYW5jZSBJbXByb3ZlbWVudCBQbGFuIChQSVApIGZvciA2IG1vbnRocyBwcmlvciB0byB0ZXJtaW5hdGlvbiwgd2hpY2ggdGhlIGNvbXBhbnkgY2xhaW1zIGhlIGZhaWxlZC4iLCAiaW5jb25zaXN0ZW5jaWVzQW5kRXZhc2lvbnMiOiB7ICJvblRoZVJlbWFyayI6ICJXaWxsIGJlIGV2YXNpdmUgYWJvdXQgYWdlLXJlbGF0ZWQgY29tbWVudHMuIElmIGNvbmZyb250ZWQgd2l0aCB0aGUgc3BlY2lmaWMgcXVvdGUsIHNoZSB3aWxsIGRlbnkgaXQsIHRoZW4gZmFsbCBiYWNrIHRvIHRoZSAnc3RyYXkgcmVtYXJrJyBkZWZlbnNlLiIsICJvbllvdW5nZXJFbXBsb3llZXMiOiAiV2lsbCBiZSByZWx1Y3RhbnQgdG8gZGlzY3VzcyB0aGUgcGVyZm9ybWFuY2Ugb2YgeW91bmdlciBlbXBsb3llZXMgd2hvIHJlcGxhY2VkIHNvbWUgb2YgQ2xhcmsncyBmdW5jdGlvbnMsIGNsYWltaW5nIGNvbmZpZGVudGlhbGl0eS4gKEZhY3Q6IEEganVuaW9yIGFuYWx5c3QsIDMyLCB3aG8gdG9vayBvdmVyIHNvbWUgZHV0aWVzIGFsc28gbWlzc2VkIGEgZGVhZGxpbmUgbGFzdCBxdWFydGVyLCBhIGZhY3QgU3VzYW4gd2lsbCBub3Qgdm9sdW50ZWVyKS4iIH0gfSB9"
+];
+
+            let appState = {
+                providerId: 'openai', apiKey: '', model: '', isJudgePresent: false, isOocMode: false, caseData: null, witnesses: [], activeWitnessIndex: 0, messages: [], isLoading: false, totalTokens: 0, totalCost: 0.0
+            };
+
+ const PROVIDERS = {
+    openai: {
+        label: "OpenAI",
+        models: [
+            { name: "gpt-4o-mini", pricing: { inputPerMillionTokens: 0.15, outputPerMillionTokens: 0.60 } },
+            { name: "gpt-4o", pricing: { inputPerMillionTokens: 5.00, outputPerMillionTokens: 15.00 } }
+        ],
+        defaultModel: "gpt-4o-mini",
+        chat: async ({ apiKey, model, messages }) => {
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+                body: JSON.stringify({ model, messages }),
+            });
+            if (!response.ok) throw new Error(`OpenAI API request failed: ${response.statusText}`);
+            const data = await response.json();
+            return {
+                message: data.choices[0].message,
+                usage: { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens }
+            };
+        },
+    },
+    gemini: {
+        label: "Google Gemini",
+        // Using the model names as you specified.
+        models: [
+            { name: "gemini-2.5-flash", pricing: { inputPerMillionTokens: 0.35, outputPerMillionTokens: 0.70 } },
+            { name: "gemini-2.5-pro", pricing: { inputPerMillionTokens: 3.50, outputPerMillionTokens: 10.50 } }
+        ],
+        defaultModel: "gemini-2.5-flash",
+        chat: async ({ apiKey, model, messages }) => {
+            const formattedMessages = messages.filter(m => m.role !== 'system').map(m => ({
+                role: m.role === 'assistant' ? 'model' : m.role,
+                parts: [{ text: m.content }]
+            }));
+            const systemInstruction = messages.find(m => m.role === 'system');
+            const body = {
+                contents: formattedMessages,
+                ...(systemInstruction && { systemInstruction: { parts: [{ text: systemInstruction.content }] } })
+            };
+            
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            // FIXED: This enhanced error handling provides specific, actionable diagnostics from the API.
+            if (!response.ok) {
+                let errorMsg = `API request failed with status ${response.status}.`;
+                try {
+                    const errorBody = await response.json();
+                    if (errorBody && errorBody.error && errorBody.error.message) {
+                        // Provides the exact error message from the Gemini API.
+                        errorMsg = `[${response.status}] ${errorBody.error.message}`;
+                    }
+                } catch (e) {
+                    errorMsg += " Could not parse error response from API.";
+                }
+                throw new Error(errorMsg);
+            }
+
+            const data = await response.json();
+
+            // FIXED: Added check for empty or blocked API responses.
+            if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {
+                let reason = "The model returned an empty response.";
+                if (data.promptFeedback && data.promptFeedback.blockReason) {
+                    reason = `Content was blocked by safety settings: ${data.promptFeedback.blockReason}.`;
+                } else if (data.candidates && data.candidates.length > 0 && data.candidates[0].finishReason) {
+                    reason = `Generation stopped unexpectedly. Reason: ${data.candidates[0].finishReason}.`;
+                }
+                throw new Error(reason);
+            }
+
+            const usage = data.usageMetadata || { promptTokenCount: 0, candidatesTokenCount: 0 };
+            
+            // FIXED: The returned message object now matches the structure the app expects.
+            return {
+                message: {
+                    role: 'assistant',
+                    content: data.candidates[0].content.parts[0].text
+                },
+                usage: { 
+                    inputTokens: usage.promptTokenCount, 
+                    outputTokens: usage.candidatesTokenCount
+                }
+            };
+        },
+    },
+};
+
+            const dom = {
+    providerSelect: document.getElementById('provider'),
+    apiKeyInput: document.getElementById('apiKey'),
+    modelSelect: document.getElementById('model'),
+    judgeModeCheckbox: document.getElementById('judgeMode'),
+    fileLoaderInput: document.getElementById('fileLoader'),
+    scenarioSelector: document.getElementById('scenarioSelector'),
+    witnessSelectorCard: document.getElementById('witnessSelectorCard'),
+    witnessSelector: document.getElementById('witnessSelector'),
+    intelCard: document.getElementById('intelCard'),
+    summaryDetailSlider: document.getElementById('summaryDetailSlider'),
+    getSummaryButton: document.getElementById('getSummaryButton'),
+    chatTitle: document.getElementById('chat-title'),
+    chatHistory: document.getElementById('chat-history'),
+    modeToggleCheckbox: document.getElementById('modeToggleCheckbox'),
+    chatInput: document.getElementById('chatInput'),
+    sendButton: document.getElementById('sendButton'),
+    saveTranscriptButton: document.getElementById('saveTranscriptButton'),
+    totalTokensSpan: document.getElementById('totalTokens'),
+    getCaseSummaryButton: document.getElementById('getCaseSummaryButton'),
+    estimatedCostSpan: document.getElementById('estimatedCost')
+};
+
+            function getActiveWitness() { return appState.witnesses[appState.activeWitnessIndex] || null; }
+            function buildDepositionPrompt(w, j) {
+    if (!w) return { role: "system", content: "Error: No witness data." };
+    const wt = JSON.stringify(w, null, 2);
+    const ji = j ? `A judge IS present. After an objection, you MUST rule on it as THE JUDGE (e.g., "Sustained." or "Overruled."). If overruled, THE WITNESS must answer.` : `A judge is NOT present. You must NOT act as a judge. After a form objection, THE WITNESS should still answer.`;
+    const dli = `**Role of OPPOSING COUNSEL (Defending Lawyer):** Your primary goal is to protect your client and the record.\n1.  **Form Objections:** For questions that are leading, compound, or assume facts, state the objection for the record (e.g., "Objection, form."), but then allow the witness to answer.\n2.  **Privilege Objections (CRITICAL):** If a question asks about communications between the witness and their attorney, you MUST object and instruct the witness not to answer. Format: "Objection, attorney-client privilege. I'm instructing the witness not to answer." THE WITNESS must then refuse to answer. This is the main reason to instruct a witness not to answer.`;
+
+    // REFINED: More nuanced instructions on truthfulness and evasiveness.
+    const isProneToPerjury = w.witnessMotivations?.isProneToPerjury === true;
+    let truthfulnessInstruction;
+
+    if (isProneToPerjury) {
+        truthfulnessInstruction = `**Witness Truthfulness:** You are willing to lie and commit perjury to protect your secret. You will deny facts and invent alternative explanations. For routine, non-threatening questions (e.g., your name, address), answer normally. Your dishonesty should only activate when the questioning approaches the information you need to conceal.`;
+    } else {
+        truthfulnessInstruction = `**Witness Truthfulness:** You must not lie. However, you must protect your secret.
+- For routine, non-threatening questions (e.g., your name, address), be cooperative and answer directly.
+- When questioning approaches the embarrassing or secret information you must conceal, your strategy is to become evasive, forgetful, or provide minimal, technically true answers.
+- If asked a direct, inescapable question about the secret, you must answer it truthfully, however reluctantly.`;
+    }
+
+    return {
+        role: "system",
+        content: `You are an AI performing roles in a legal deposition.\n\n**Roles & Rules:**\n1.  **THE WITNESS:** Your primary role, defined by the JSON below. Stay in character.\n2.  **OPPOSING COUNSEL:** You must also act as the witness's lawyer. ${dli}\n3.  **THE JUDGE:** ${ji}\n\n**Execution:** Never mention you are an AI. You ARE the people you are portraying. Uphold all concealment motivations from the JSON according to the truthfulness rule below.\n\n${truthfulnessInstruction}\n\n**Witness Dossier:**\n\`\`\`json\n${wt}\n\`\`\``
+    };
+}
+            function buildOocPrompt(w, h) { const ht = h.slice(1).map(m => `${m.role === 'user' ? 'Examiner' : (m.isOoc ? 'Coach' : 'Witness')}: ${m.content}`).join('\n'); return { role: "system", content: `You are an expert deposition coach AI. The user is in "Coach Mode" and needs out-of-character help. Your persona is a helpful law professor.\n\n**CRITICAL:** You must BREAK CHARACTER from the witness/lawyer persona. DO NOT answer in character.\n\nAnalyze the user's latest question based on the full deposition history provided below. Provide a helpful, meta-level response. Give hints, suggest better questions, or explain legal concepts.\n\n**Deposition History:**\n${ht}\n\n**Witness Dossier for Context:**\n\`\`\`json\n${JSON.stringify(w, null, 2)}\n\`\`\`` }; }
+            function buildSummaryPrompt(w, d) {
+    const dm = { 1: "a brief one-paragraph summary", 2: "a moderate summary with bullet points", 3: "a detailed summary" };
+    const di = dm[d];
+    const pi = { "Witness Name": w?.name || w?.witnessBackground?.personalDetails?.fullName, "Basic Details": { Age: w?.witnessBackground?.personalDetails?.age, Occupation: w?.witnessBackground?.personalDetails?.occupation, Residence: w?.witnessBackground?.personalDetails?.residence, }, "Professional Reputation": w?.witnessBackground?.professionalLife?.reputation, "Official Statement Summary": w?.fullWitnessInformation?.officialStatementSummary };
+    Object.keys(pi).forEach(k => (pi[k] === undefined || pi[k] === null) && delete pi[k]);
+    if(pi["Basic Details"]){ Object.keys(pi["Basic Details"]).forEach(k => (pi["Basic Details"][k] === undefined || pi["Basic Details"][k] === null) && delete pi["Basic Details"][k]); }
+    return {
+        role: "user", // <-- This is the only line that has changed
+        content: `You are a legal assistant providing a pre-deposition briefing. Based ONLY on the following pre-vetted information, provide ${di}. Do not infer or add any information not present below. Do not provide analysis or advice.\n\n**Vetted Witness Information:**\n\`\`\`json\n${JSON.stringify(pi, null, 2)}\n\`\`\``
+    };
+}
+            function buildCaseSummaryPrompt(w, d) {
+    const dm = { 1: "a brief one-paragraph summary", 2: "a moderate summary with bullet points", 3: "a detailed, multi-paragraph summary" };
+    const di = dm[d];
+    const wt = JSON.stringify(w, null, 2);
+
+    return {
+        role: "user",
+        content: `You are a senior legal analyst. Your task is to provide a plausible case summary based on the provided witness dossier. The dossier contains information about ONE witness in a larger, unstated legal case.
+
+Your analysis must:
+1.  **Infer the Legal Context:** Based on the witness's role, statements, and secrets, determine the most likely type of legal case this deposition is for (e.g., "age discrimination lawsuit," "personal injury claim," "homicide prosecution," "civil suit for battery").
+2.  **Synthesize a Narrative:** Create a brief narrative for the case. Who is likely suing whom (or who is prosecuting whom)? What is the central legal issue at stake?
+3.  **Use Only Provided Facts:** Base your summary ONLY on the information in the dossier. Do not invent details unrelated to the witness's testimony (e.g., do not invent new characters or events not hinted at in the dossier).
+4.  **Acknowledge Inference:** Frame your response as a plausible inference, not as established fact. For example, start with "This deposition appears to be part of..." or "The likely legal context for this witness is..."
+5.  **Adhere to Detail Level:** Provide ${di}.
+
+**Witness Dossier for Analysis:**
+\`\`\`json
+${wt}
+\`\`\``
+    };
+}
+
+            function renderProviderOptions() { dom.providerSelect.innerHTML = ''; for (const [id, p] of Object.entries(PROVIDERS)) { const o = document.createElement('option'); o.value = id; o.textContent = p.label; dom.providerSelect.appendChild(o); } }
+            function renderModelOptions() { const p = PROVIDERS[appState.providerId]; dom.modelSelect.innerHTML = ''; p.models.forEach(m => { const o = document.createElement('option'); o.value = m.name; o.textContent = m.name; dom.modelSelect.appendChild(o); }); appState.model = p.defaultModel; dom.modelSelect.value = p.defaultModel; }
+            function renderChatMessages() { dom.chatHistory.innerHTML = ''; appState.messages.slice(1).forEach(m => { const wr = document.createElement('div'); wr.className = 'message-wrapper'; const md = document.createElement('div'); md.className = 'chat-message'; if (m.isOoc) { md.classList.add('meta-message'); } else { md.classList.add(m.role === 'user' ? 'user-message' : 'assistant-message'); } md.textContent = m.content; wr.appendChild(md); dom.chatHistory.appendChild(wr); }); if (appState.isLoading) { const ti = document.createElement('div'); ti.className = 'typing-indicator assistant-message'; ti.textContent = 'Typing...'; dom.chatHistory.appendChild(ti); } dom.chatHistory.scrollTop = dom.chatHistory.scrollHeight; }
+            function renderCost() { dom.totalTokensSpan.textContent = appState.totalTokens.toLocaleString(); dom.estimatedCostSpan.textContent = `$${appState.totalCost.toFixed(6)}`; }
+            function updateUI() { const w = getActiveWitness(); const i = w !== null; const h = appState.messages.length > 1; dom.intelCard.style.display = i ? 'block' : 'none'; dom.chatInput.disabled = !i || appState.isLoading; dom.sendButton.disabled = !i || appState.isLoading; dom.modeToggleCheckbox.disabled = !i || appState.isLoading; dom.saveTranscriptButton.disabled = !i || appState.isLoading || !h; dom.getSummaryButton.disabled = !i || appState.isLoading; dom.chatInput.placeholder = appState.isOocMode ? "Ask for a hint or feedback..." : (i ? "Type your question..." : "Choose or upload a scenario to begin..."); if (w) { const wn = w.name || w?.witnessBackground?.personalDetails?.fullName || 'Unnamed Witness'; dom.chatTitle.textContent = `Deposition of: ${wn}`; } else { dom.chatTitle.textContent = 'Deposition'; } }
+            function resetChat() { const w = getActiveWitness(); appState.messages = w ? [buildDepositionPrompt(w, appState.isJudgePresent)] : []; appState.totalTokens = 0; appState.totalCost = 0.0; renderCost(); renderChatMessages(); updateUI(); }
+
+            function updateCost(u) { const p = PROVIDERS[appState.providerId]; const m = p.models.find(mod => mod.name === appState.model); if (!m || !u) return; const iC = (u.inputTokens / 1000000) * m.pricing.inputPerMillionTokens; const oC = (u.outputTokens / 1000000) * m.pricing.outputPerMillionTokens; appState.totalTokens += (u.inputTokens + u.outputTokens); appState.totalCost += (iC + oC); renderCost(); }
+            function handleSaveTranscript() { const w = getActiveWitness(); if (!w) return; const wn = w.name || w?.witnessBackground?.personalDetails?.fullName || 'Unnamed Witness'; const t = new Date().toISOString().slice(0, 10); let tc = `# Deposition Transcript\n\n- **Witness:** ${wn}\n- **Date:** ${t}\n- **LLM Provider:** ${PROVIDERS[appState.providerId].label}\n- **LLM Model:** ${appState.model}\n---\n\n`; appState.messages.slice(1).forEach(m => { let s = ""; if (m.role === 'user') s = "Examiner"; else if (m.isOoc) s = "Coach"; else s = "Witness"; tc += `**${s}:** ${m.content}\n\n`; }); const b = new Blob([tc], { type: 'text/markdown' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = `Deposition-of-${wn.replace(/\s+/g, '_')}-${t}.md`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
+            async function handleSendMessage() { const q = dom.chatInput.value.trim(); if (!q || appState.isLoading) return; const um = { role: 'user', content: q, isOoc: appState.isOocMode }; let tp; if (appState.isOocMode) { tp = buildOocPrompt(getActiveWitness(), appState.messages); } else { tp = buildDepositionPrompt(getActiveWitness(), appState.isJudgePresent); } const am = [tp, ...appState.messages.slice(1), um]; appState.messages.push(um); appState.isLoading = true; renderChatMessages(); updateUI(); dom.chatInput.value = ''; dom.chatInput.style.height = 'auto'; try { if (!appState.apiKey) throw new Error("API Key is missing."); const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: am }); message.isOoc = appState.isOocMode; appState.messages.push(message); updateCost(usage); } catch (e) { console.error("API Error:", e); appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true }); } finally {
+    appState.isLoading = false;
+    renderChatMessages();
+    updateUI();
+    dom.chatInput.focus(); // Add this line
+}
+             async function handleGetSummary() {
+    const w = getActiveWitness();
+    if (!w || appState.isLoading) return;
+    const dl = dom.summaryDetailSlider.value;
+    const sp = buildSummaryPrompt(w, dl);
+    appState.isLoading = true;
+    renderChatMessages();
+    updateUI();
+    try {
+        if (!appState.apiKey) throw new Error("API Key is missing.");
+        const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: [sp] });
+        message.isOoc = true;
+        appState.messages.push(message);
+        updateCost(usage);
+    } catch (e) {
+        console.error("API Error:", e);
+        appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true });
+    } finally {
+        appState.isLoading = false;
+        renderChatMessages();
+        updateUI();
+        // This is the line to add here:
+        dom.chatInput.focus(); 
+    }
+}                                   
+            async function handleGetCaseSummary() {
+    const w = getActiveWitness();
+    if (!w || appState.isLoading) return;
+    const dl = dom.summaryDetailSlider.value;
+    const sp = buildCaseSummaryPrompt(w, dl); // Use the new prompt function
+    appState.isLoading = true;
+    renderChatMessages();
+    updateUI();
+    try {
+        if (!appState.apiKey) throw new Error("API Key is missing.");
+        const { message, usage } = await PROVIDERS[appState.providerId].chat({ apiKey: appState.apiKey, model: appState.model, messages: [sp] });
+        message.isOoc = true;
+        appState.messages.push(message);
+        updateCost(usage);
+    } catch (e) {
+        console.error("API Error:", e);
+        appState.messages.push({ role: 'assistant', content: `Error: ${e.message}`, isOoc: true });
+    } finally {
+        appState.isLoading = false;
+        renderChatMessages();
+        updateUI();
+        dom.chatInput.focus(); // Add this line
+    }
+}
+            function loadWitnessData(data) { appState.caseData = data; if (Array.isArray(data.witnesses)) { appState.witnesses = data.witnesses; dom.witnessSelector.innerHTML = ''; appState.witnesses.forEach((w, i) => { const o = document.createElement('option'); o.value = i; o.textContent = w.name || w?.witnessBackground?.personalDetails?.fullName || `Witness ${i + 1}`; dom.witnessSelector.appendChild(o); }); dom.witnessSelectorCard.style.display = 'block'; } else { appState.witnesses = [data]; dom.witnessSelectorCard.style.display = 'none'; } appState.activeWitnessIndex = 0; resetChat(); }
+            
+            dom.providerSelect.addEventListener('change', (e) => { appState.providerId = e.target.value; renderModelOptions(); });
+            dom.apiKeyInput.addEventListener('change', (e) => { appState.apiKey = e.target.value; localStorage.setItem(`llm_${appState.providerId}_key`, appState.apiKey); });
+            dom.modelSelect.addEventListener('change', (e) => { appState.model = e.target.value; });
+            dom.judgeModeCheckbox.addEventListener('change', (e) => { appState.isJudgePresent = e.target.checked; });
+            dom.fileLoaderInput.addEventListener('change', (e) => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { const p = JSON.parse(ev.target.result); loadWitnessData(p); dom.scenarioSelector.value = "-1"; } catch (err) { alert("Invalid JSON file."); console.error("JSON Parse Error:", err); } }; r.readAsText(f); });
+            dom.scenarioSelector.addEventListener('change', (e) => {
+    const index = parseInt(e.target.value, 10);
+    if (index >= 0) {
+        const encodedData = PRE_BUILT_SCENARIOS[index];
+        try {
+            // atob() is the built-in browser function to decode Base64
+            const decodedData = atob(encodedData);
+            const jsonData = JSON.parse(decodedData);
+            loadWitnessData(jsonData);
+            dom.fileLoaderInput.value = "";
+        } catch (err) {
+            console.error("Failed to decode or parse scenario:", err);
+            // We use a simple message box instead of alert()
+            const errorMsg = { role: 'assistant', content: `Error: Could not load the selected scenario. It might be corrupted.`, isOoc: true };
+            appState.messages.push(errorMsg);
+            renderChatMessages();
+        }
+    }
+});
+            if (dom.witnessSelector) {
+                dom.witnessSelector.addEventListener('change', (e) => { appState.activeWitnessIndex = Number(e.target.value); resetChat(); });
+            }
+            
+            dom.modeToggleCheckbox.addEventListener('change', (e) => { appState.isOocMode = e.target.checked; updateUI(); });
+            dom.getSummaryButton.addEventListener('click', handleGetSummary);
+            dom.getCaseSummaryButton.addEventListener('click', handleGetCaseSummary); // Add this line
+            dom.chatInput.addEventListener('input', () => { dom.chatInput.style.height = 'auto'; dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px'; });
+            dom.chatInput.addEventListener('input', () => { dom.chatInput.style.height = 'auto'; dom.chatInput.style.height = (dom.chatInput.scrollHeight) + 'px'; });
+            dom.sendButton.addEventListener('click', handleSendMessage);
+            dom.saveTranscriptButton.addEventListener('click', handleSaveTranscript);
+            dom.chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
+
+            function initialize() {
+                renderProviderOptions();
+                const defaultProviderId = dom.providerSelect.value || 'openai';
+                appState.providerId = defaultProviderId;
+                appState.apiKey = localStorage.getItem(`llm_${defaultProviderId}_key`) || '';
+                dom.apiKeyInput.value = appState.apiKey;
+                renderModelOptions();
+                updateUI();
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
