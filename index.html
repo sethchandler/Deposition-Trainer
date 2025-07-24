@@ -625,9 +625,15 @@ document.addEventListener('DOMContentLoaded', () => {
             requiresSetup: true,
             models: [
                 { name: "llama3.1:8b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
-                { name: "qwen2.5:7b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
-                { name: "mistral:7b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
-                { name: "llama3.1:70b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } }
+                { name: "llama3.3:latest", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                { name: "qwen3:8b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                { name: "qwen3:14b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } ,
+                 { name: "deepseek-r1:8b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } ,
+                 { name: "deepseek-r1:14b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } ,
+                 { name: "gemma3n-e2b", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } ,
+                { name: "magistral:latest", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                {name: "mistral-nemo:latest", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } },
+                {name: "qwq:latest", pricing: { inputPerMillionTokens: 0, outputPerMillionTokens: 0 } }
             ],
             defaultModel: "llama3.1:8b",
             chat: async ({ model, messages }) => {
